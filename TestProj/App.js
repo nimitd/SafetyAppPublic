@@ -6,13 +6,40 @@ const instructions = Platform.select({
   android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
 });
 
+import Constants from "expo-constants";
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
 export default class App extends Component {
-  render() {
+  
+    constructor(props)  {
+      super(props);
+      this.state = {apiResponse: "initial data"};
+    }
+
+    // call the test API and set apiResponse variable to
+    // the result of the fetch
+    callAPI() {
+      fetch(uri + "/testAPI")
+        .then(res => res.text())
+        .then(res => this.setState({apiResponse: res}))
+        .catch(err => err);
+    }
+
+    // Run after the front end app is completely mounted
+    componentDidMount() {
+      this.callAPI();
+    }
+
+
+    render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
         <Text style={styles.instructions}>This branch is for working on initial features.</Text>
         <Text style={styles.instructions}>{instructions}</Text>
+        <Text style={styles.instructions}>{this.state.apiResponse}</Text>
       </View>
     );
   }
