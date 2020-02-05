@@ -6,10 +6,9 @@ const instructions = Platform.select({
   android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
 });
 
-function InputPhone() {
-
-  return (
-      <KeyboardAvoidingView style={styles.container}>
+export default class EnterPhone extends Component {
+  render() {
+    <KeyboardAvoidingView style={styles.container}>
         <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
         <Text style={styles.instructions}>To sign up, please enter your phone number:</Text>
         <TextInput style={styles.phonenumber}
@@ -22,38 +21,6 @@ function InputPhone() {
         />
         <Text style={styles.warning}>(Don't worry, we will never share your number with anyone without your permission.)</Text>
     </KeyboardAvoidingView>
-    );
-}
-
-function InputCode() {
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>You've got mail!</Text>
-      <Text style={styles.instructions}>We just sent you a code. Please enter it below</Text>
-        <TextInput style={styles.phonenumber}
-          editable
-          maxLength={6}
-          placeholder="_ _ _ _ _ _"
-          returnKeyType='done'
-          keyboardType='phone-pad'
-          onSubmitEditing={this.InputCode}
-        />
-        <Text style={styles.warning}>Didn't get a code? Tap below to resend it to your phone number.</Text>
-        <Button
-            title="Resend Code"
-          />
-    </View>
-  );
-}
-
-export default class App extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <InputCode/>
-      </View>
-    );
   }
 }
 
