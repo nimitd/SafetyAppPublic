@@ -12,14 +12,27 @@ import {
   Alert,
   Picker
 } from 'react-native';
-import CreateOrJoin from './Components/CreateOrJoin';
+
+//import CreateOrJoin from './Components/CreateOrJoin';
+//import * as Components from './Components';
+import EnterPhone from './Components/EnterPhone';
 import { Dropdown } from 'react-native-material-dropdown';
 
 export default class App extends Component {
 
-  render () {
+  state = {loggedIn: false}
+   updateLoggedIn = () => {
+      this.setState({ loggedIn: true })
+   }
 
+  render () {
+    if (!loogedIn) {
+      return(
+        <EnterPhone/>
+      );
+    }
     return(
+
       <View>
         <Text>Hello World</Text>
       </View>
