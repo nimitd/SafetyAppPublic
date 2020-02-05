@@ -15,88 +15,15 @@ import {
 import CreateOrJoin from './Components/CreateOrJoin';
 import { Dropdown } from 'react-native-material-dropdown';
 
-export default class Register extends Component {
+export default class App extends Component {
 
-  constructor(props) {
-    super(props);
-    state = {
-      name   : '',
-      suid: '',
-      dorm: '',
-      displayButtons: false,
-    }
-  }
+  render () {
 
-  buttonListener = () => {
-  	this.setState({
-  		displayButtons: !this.state.displayButtons
-  	});
-
-
-  }
-
-  state = {dorm: ''}
-   updateDorm = (dorm) => {
-      this.setState({ dorm: dorm })
-   }
-
-render() {
-
-	if (this.state.displayButtons) { 
-		return <CreateOrJoin/>
-
-	} else {
-    return (
-    <View style = {styles.container}>
-    <View style = {styles.textboxcontainers}>
-      <Text style = {styles.header}> Enter your information below to get started. </Text>
-	    <View style={styles.inputContainer}>
-	      <TextInput style={styles.inputs}
-	          placeholder="Full name"
-	          onChangeText={(name) => this.setState({name})}/>
-	    </View>
-
-
-	    <View style={styles.inputContainer}>
-          <TextInput style={styles.inputs}
-              placeholder="SUID (eg: gitakris)"
-              onChangeText={(suid) => this.setState({suid})}/>
-        </View>
+    return(
+      <View>
+        <Text>Hello World</Text>
       </View>
-
-       <View style = {styles.dropdown}>
-      <Dropdown
-		        label='Choose your residence'
-		        data={[
-		        {value: 'Mars'},
-		        {value: '680'},
-		       	{value: 'Xanadu'},
-		        {value: 'Casa'},
-		        {value: 'Bob'},
-		        {value: 'Storey'},
-		        {value: 'Grove'},
-		        {value: 'Slav'},
-		        {value: 'Haus Mitt'},
-		        {value: 'Phi Sig'},
-		        {value: 'Kairos'},
-		        {value: 'EBF'},
-		        {value: 'Synergy'},
-		       	{value: 'Durand'},
-
-		        ]}
-		      />
-		</View>
-		<View style = {styles.buttonSpaceContainer}>
-		<TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
-          <Text style={styles.loginText}>Register</Text>
-        </TouchableHighlight>
-        </View>
-
-
-
-     </View>
     );
-}
   }
 }
 
