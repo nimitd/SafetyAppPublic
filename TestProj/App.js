@@ -8,6 +8,7 @@ const instructions = Platform.select({
 
 import Constants from "expo-constants";
 const { manifest } = Constants;
+import axios from 'axios';
 
 const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
@@ -21,10 +22,23 @@ export default class App extends Component {
     // call the test API and set apiResponse variable to
     // the result of the fetch
     callAPI() {
-      fetch(uri + "/testAPI")
-        .then(res => res.text())
-        .then(res => this.setState({apiResponse: res}))
-        .catch(err => err);
+      const body = {first_name: "t_f", last_name: "t_l",
+        suid: "t_s", phone: "1234567890"};
+      axios.get(uri + '/hello')
+        .then(res =>console.log(res.data))
+        .catch((error) => {
+            console.log(error)
+        });
+      axios.post(uri + '/test_post', body)
+        .then(res =>console.log(res.data))
+        .catch((error) => {
+            console.log(error)
+        });
+      axios.get(uri + '/get_all_users')
+        .then(res => console.log("Doing something with data: " + res.data[0].phone_number))
+        .catch((error) => {
+            console.log(error)
+        });
     }
 
     // Run after the front end app is completely mounted
