@@ -1,10 +1,19 @@
-import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
-});
+// cite: https://www.bootdey.com/react-native-snippet/9/Login-form-ui-example
+
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button, 
+  TouchableHighlight,
+  Alert,
+  Picker
+} from 'react-native';
+import CreateOrJoin from './Components/CreateOrJoin';
+import { Dropdown } from 'react-native-material-dropdown';
 
 import Constants from "expo-constants";
 const { manifest } = Constants;
@@ -12,68 +21,159 @@ import axios from 'axios';
 
 const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
-export default class App extends Component {
-  
-    constructor(props)  {
-      super(props);
-      this.state = {apiResponse: "initial data"};
-    }
+export default class Register extends Component {
 
-    // call the test API and set apiResponse variable to
-    // the result of the fetch
-    callAPI() {
-      const body = {first_name: "t_f", last_name: "t_l",
-        suid: "t_s", phone: "1234567890"};
-      axios.get(uri + '/hello')
-        .then(res =>console.log(res.data))
+  constructor(props) {
+    super(props);
+    state = {
+      name   : '',
+      suid: '',
+      dorm: '',
+      displayButtons: false,
+    }
+  }
+
+  buttonListener = () => {
+  	this.setState({
+  		displayButtons: !this.state.displayButtons
+  	});
+    // Send Name and SUID to server for account creation
+    const body = {name: this.state.name,
+        suid: this.state.suid, dorm: this.state.dorm};
+    axios.post(uri + '/send_prelim_user_data', body)
+        .then(res =>  {
+          d = res.data[0].first_name
+          Alert.alert(d);
+          console.log(d);
+        })
         .catch((error) => {
             console.log(error)
         });
-      axios.post(uri + '/test_post', body)
-        .then(res =>console.log(res.data))
-        .catch((error) => {
-            console.log(error)
-        });
-      axios.get(uri + '/get_all_users')
-        .then(res => console.log("Doing something with data: " + res.data[0].phone_number))
-        .catch((error) => {
-            console.log(error)
-        });
-    }
+    
+  }
 
-    // Run after the front end app is completely mounted
-    componentDidMount() {
-      this.callAPI();
-    }
+  state = {dorm: ''}
+   updateDorm = (dorm) => {
+      this.setState({ dorm: dorm })
+   }
 
+render() {
 
-    render() {
+	if (this.state.displayButtons) { 
+		return <CreateOrJoin/>
+
+	} else {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
-        <Text style={styles.instructions}>This branch is for working on initial features.</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-        <Text style={styles.instructions}>{this.state.apiResponse}</Text>
+    <View style = {styles.container}>
+    <View style = {styles.textboxcontainers}>
+      <Text style = {styles.header}> Enter your information below to get started. </Text>
+	    <View style={styles.inputContainer}>
+	      <TextInput style={styles.inputs}
+	          placeholder="Full name"
+	          onChangeText={(name) => this.setState({name})}/>
+	    </View>
+
+
+	    <View style={styles.inputContainer}>
+          <TextInput style={styles.inputs}
+              placeholder="SUID (eg: gitakris)"
+              onChangeText={(suid) => this.setState({suid})}/>
+        </View>
       </View>
+
+       <View style = {styles.dropdown}>
+      <Dropdown
+		        label='Choose your residence'
+		        data={[
+		        {value: 'Mars'},
+		        {value: '680'},
+		       	{value: 'Xanadu'},
+		        {value: 'Casa'},
+		        {value: 'Bob'},
+		        {value: 'Storey'},
+		        {value: 'Grove'},
+		        {value: 'Slav'},
+		        {value: 'Haus Mitt'},
+		        {value: 'Phi Sig'},
+		        {value: 'Kairos'},
+		        {value: 'EBF'},
+		        {value: 'Synergy'},
+		       	{value: 'Durand'},
+
+		        ]}
+		      />
+		</View>
+		<View style = {styles.buttonSpaceContainer}>
+		<TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
+          <Text style={styles.loginText}>Register</Text>
+        </TouchableHighlight>
+        </View>
+
+
+
+     </View>
     );
+}
   }
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: '#DCDCDC',
+  },
+  buttonSpaceContainer: {
+  	flex: 0.5, 
+  	justifyContent: 'center',
+  	alignItems: 'center',
+  },
+  textboxcontainers: {
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
-  welcome: {
+  header: {
+  	fontSize: 20,
+    textAlign: 'center',
+    margin: 30,
+	},
+  inputContainer: {
+      borderBottomColor: '#F5FCFF',
+      backgroundColor: '#FFFFFF',
+      borderRadius:30,
+      borderBottomWidth: 1,
+      width:250,
+      height:45,
+      marginBottom:20,
+      flexDirection: 'row',
+      alignItems:'center',
+  },
+  inputs:{
+      height:45,
+      marginLeft:16,
+      borderBottomColor: '#FFFFFF',
+      flex:1,
+  },
+  buttonContainer: {
+    height:45,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom:20,
+    width:250,
+    borderRadius:30,
+  },
+  loginButton: {
+    backgroundColor: "maroon",
+  },
+  loginText: {
+    color: 'white',
     fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  dropdown: {
+  	flexDirection: 'column',
+  	justifyContent: 'center',
+  	marginLeft: 20,
+  	marginRight: 20,
   },
 });

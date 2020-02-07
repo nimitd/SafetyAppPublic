@@ -26,6 +26,20 @@ router.get("/get_all_users", (req, res) => {
     })
 })
 
+router.post('/send_prelim_user_data', (req, res) => {
+	var name = req.body.name;
+	var suid = req.body.suid;
+	var dorm = req.body.dorm;
+	console.log("Received User for: " + name + suid + dorm);
+	con.query(`SELECT * FROM app_data.users;`,
+          (q_err, q_res) => {
+          if(q_err) return next(q_err);
+          console.log("after sequel error")
+          console.log(q_res)
+          res.send(q_res)
+    })
+})
+
 // router.post('/add_user', (req, res) => {
 // 	const values = [ req.body.first_name, 
 //                    req.body.last_name,
