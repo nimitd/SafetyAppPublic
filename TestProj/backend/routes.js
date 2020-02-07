@@ -7,7 +7,7 @@ var router = express.Router()
 var con = require('./db');
 
 router.get('/hello', (req, res) => {
-	console.log("Received" + req.body)
+	console.log("Received")
 	res.json('Returning back some message')
 })
 
