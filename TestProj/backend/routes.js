@@ -26,17 +26,28 @@ router.get("/get_all_users", (req, res) => {
     })
 })
 
-router.post('/send_prelim_user_data', (req, res) => {
-	var name = req.body.name;
+router.post('/send_prelim_user_data', (req, res, callback) => {
+	var first_name = req.body.first_name;
+	var last_name = req.body.last_name;
 	var suid = req.body.suid;
 	var dorm = req.body.dorm;
-	console.log("Received User for: " + name + suid + dorm);
-	con.query(`SELECT * FROM app_data.users;`,
-          (q_err, q_res) => {
-          if(q_err) return next(q_err);
-          console.log("after sequel error")
-          console.log(q_res)
-          res.send(q_res)
+	const values = [[ req.body.first_name, 
+                   req.body.last_name,
+                   req.body.suid, 
+                   req.body.dorm]];
+	var sql_insert = "INSERT INTO app_data.users(first_name, last_name, suid, residence) VALUES ?";
+	console.log(sql_insert)
+	con.query(sql_insert, [values], (q_err, q_res) => {
+        if(q_err){
+        	if (q_err.code == 'ER_DUP_ENTRY' || q_err.errno == 1062) {
+          		console.log("Duplicate error caught");
+          		res.status(401).send("Duplicate user error!");
+        	}
+		}
+        else	{
+	        console.log(q_res)
+	        res.send(q_res)
+      	}
     })
 })
 

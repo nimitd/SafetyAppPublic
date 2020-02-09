@@ -25,31 +25,35 @@ export default class Register extends Component {
 
   constructor(props) {
     super(props);
-    state = {
-      name   : '',
+    this.state = {
+      first_name   : '',
+      last_name: '',
       suid: '',
       dorm: '',
       displayButtons: false,
+      error: false
     }
   }
 
   buttonListener = () => {
-  	this.setState({
-  		displayButtons: !this.state.displayButtons
-  	});
+  	
     // Send Name and SUID to server for account creation
-    const body = {name: this.state.name,
+    const body = {first_name: this.state.first_name, last_name: this.state.last_name,
         suid: this.state.suid, dorm: this.state.dorm};
     axios.post(uri + '/send_prelim_user_data', body)
         .then(res =>  {
-          d = res.data[0].first_name
-          Alert.alert(d);
-          console.log(d);
+          this.setState({ error: false});
+          this.setState({displayButtons: true});
         })
         .catch((error) => {
-            console.log(error)
-        });
-    
+          if (error.response){
+            if (error.response.status == 401) {
+              this.setState({ error: true })
+              Alert.alert("User with SUID already exists, please enter unique SUID")
+            }
+          console.log(error)
+          }
+      });
   }
 
   state = {dorm: ''}
@@ -58,8 +62,10 @@ export default class Register extends Component {
    }
 
 render() {
+  console.log(this.state.displayButtons)
+  console.log(this.state.error)
 
-	if (this.state.displayButtons) { 
+	if (this.state.displayButtons && !this.state.error) { 
 		return <CreateOrJoin/>
 
 	} else {
@@ -69,9 +75,15 @@ render() {
       <Text style = {styles.header}> Enter your information below to get started. </Text>
 	    <View style={styles.inputContainer}>
 	      <TextInput style={styles.inputs}
-	          placeholder="Full name"
-	          onChangeText={(name) => this.setState({name})}/>
+	          placeholder="First name"
+	          onChangeText={(first_name) => this.setState({first_name})}/>
 	    </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput style={styles.inputs}
+            placeholder="Last name"
+            onChangeText={(last_name) => this.setState({last_name})}/>
+      </View>
 
 
 	    <View style={styles.inputContainer}>
@@ -83,6 +95,7 @@ render() {
 
        <View style = {styles.dropdown}>
       <Dropdown
+            onChangeText={(dorm) => this.setState({dorm})}
 		        label='Choose your residence'
 		        data={[
 		        {value: 'Mars'},
