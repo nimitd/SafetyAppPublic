@@ -12,27 +12,46 @@ import {
   Alert,
   Picker
 } from 'react-native';
-import CreateOrJoin from './Components/CreateOrJoin';
+import CreateOrJoin from './CreateOrJoin';
 import { Dropdown } from 'react-native-material-dropdown';
+
+import Constants from "expo-constants";
+const { manifest } = Constants;
+import axios from 'axios';
 
 export default class Register extends Component {
 
   constructor(props) {
     super(props);
+
+    this.register=props.onRegister;
+    this.uri = props.uri;
+
     state = {
-      name   : '',
+      first_name   : '',
+      last_name: '',
       suid: '',
-      dorm: '',
-      displayButtons: false,
+      dorm: ''
     }
   }
 
   buttonListener = () => {
-  	this.setState({
-  		displayButtons: !this.state.displayButtons
-  	});
-
-
+    // Send Name and SUID to server for account creation
+    const body = {first_name: this.state.first_name, last_name: this.state.last_name,
+        suid: this.state.suid, dorm: this.state.dorm};
+    console.log(body);
+    axios.post(this.uri + '/send_prelim_user_data', body)
+        .then(res =>  {
+          this.register(this.state.suid);
+        })
+        .catch((error) => {
+          if (error.response){
+            if (error.response.status == 401) {
+              Alert.alert("User with SUID already exists, please enter unique SUID")
+            }
+          console.log(error)
+          }
+      });
   }
 
   state = {dorm: ''}
@@ -41,20 +60,23 @@ export default class Register extends Component {
    }
 
 render() {
-
-	if (this.state.displayButtons) { 
-		return <CreateOrJoin/>
-
-	} else {
     return (
     <View style = {styles.container}>
     <View style = {styles.textboxcontainers}>
       <Text style = {styles.header}> Enter your information below to get started. </Text>
-	    <View style={styles.inputContainer}>
-	      <TextInput style={styles.inputs}
-	          placeholder="Full name"
-	          onChangeText={(name) => this.setState({name})}/>
-	    </View>
+	    
+
+      <View style={styles.inputContainer}>
+        <TextInput style={styles.inputs}
+            placeholder="First name"
+            onChangeText={(first_name) => this.setState({first_name})}/>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput style={styles.inputs}
+            placeholder="Last name"
+            onChangeText={(last_name) => this.setState({last_name})}/>
+      </View>
 
 
 	    <View style={styles.inputContainer}>
@@ -65,38 +87,38 @@ render() {
       </View>
 
        <View style = {styles.dropdown}>
-      <Dropdown
-		        label='Choose your residence'
-		        data={[
-		        {value: 'Mars'},
-		        {value: '680'},
-		       	{value: 'Xanadu'},
-		        {value: 'Casa'},
-		        {value: 'Bob'},
-		        {value: 'Storey'},
-		        {value: 'Grove'},
-		        {value: 'Slav'},
-		        {value: 'Haus Mitt'},
-		        {value: 'Phi Sig'},
-		        {value: 'Kairos'},
-		        {value: 'EBF'},
-		        {value: 'Synergy'},
-		       	{value: 'Durand'},
+          <Dropdown
+              onChangeText={(dorm) => this.setState({dorm})}
+    		        label='Choose your residence'
+    		        data={[
+    		        {value: 'Mars'},
+    		        {value: '680'},
+    		       	{value: 'Xanadu'},
+    		        {value: 'Casa'},
+    		        {value: 'Bob'},
+    		        {value: 'Storey'},
+    		        {value: 'Grove'},
+    		        {value: 'Slav'},
+    		        {value: 'Haus Mitt'},
+    		        {value: 'Phi Sig'},
+    		        {value: 'Kairos'},
+    		        {value: 'EBF'},
+    		        {value: 'Synergy'},
+    		       	{value: 'Durand'},
 
-		        ]}
-		      />
-		</View>
-		<View style = {styles.buttonSpaceContainer}>
-		<TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
-          <Text style={styles.loginText}>Register</Text>
-        </TouchableHighlight>
+    		        ]}
+    		      />
+		    </View>
+    		<View style = {styles.buttonSpaceContainer}>
+    		  <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
+            <Text style={styles.loginText}>Register</Text>
+          </TouchableHighlight>
         </View>
 
 
 
      </View>
     );
-}
   }
 }
 

@@ -1,4 +1,3 @@
-
 // cite: https://www.bootdey.com/react-native-snippet/9/Login-form-ui-example
 
 import React, { Component } from 'react';
@@ -12,108 +11,55 @@ import {
   Alert,
   Picker
 } from 'react-native';
-import CreateOrJoin from './Components/CreateOrJoin';
+
+//import CreateOrJoin from './Components/CreateOrJoin';
+//import * as Components from './Components';
+import EnterPhone from './Components/EnterPhone';
+import Register from './Components/Register'
+import CreateOrJoin from './Components/CreateOrJoin'
 import { Dropdown } from 'react-native-material-dropdown';
 
+// backend connect code
 import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
 const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
-export default class Register extends Component {
+export default class App extends Component {
 
   constructor(props) {
     super(props);
-    state = {
-      name   : '',
-      suid: '',
-      dorm: '',
-      displayButtons: false,
+
+    this.state = {loggedIn: false, registered: false, suid: ""};
+  }
+
+  login = () => {
+      this.setState({ loggedIn: true });
+  }
+
+  register = (id) => {
+      this.setState({ registered: true, suid: id });
+  }
+
+  render () {
+    if (!this.state.registered) {
+      return <Register
+        onRegister={this.register}
+        uri={uri}/>
+    } else if (!this.state.loggedIn) {
+      return <EnterPhone
+        uri={uri}
+        suid={this.state.suid}
+        onLogin={this.login}/>
     }
-  }
-
-  buttonListener = () => {
-  	this.setState({
-  		displayButtons: !this.state.displayButtons
-  	});
-    // Send Name and SUID to server for account creation
-    const body = {name: this.state.name,
-        suid: this.state.suid, dorm: this.state.dorm};
-    axios.post(uri + '/send_prelim_user_data', body)
-        .then(res =>  {
-          d = res.data[0].first_name
-          Alert.alert(d);
-          console.log(d);
-        })
-        .catch((error) => {
-            console.log(error)
-        });
     
-  }
+    else {
+      return <CreateOrJoin
+        uri={uri} />
 
-  state = {dorm: ''}
-   updateDorm = (dorm) => {
-      this.setState({ dorm: dorm })
-   }
-
-render() {
-
-	if (this.state.displayButtons) { 
-		return <CreateOrJoin/>
-
-	} else {
-    return (
-    <View style = {styles.container}>
-    <View style = {styles.textboxcontainers}>
-      <Text style = {styles.header}> Enter your information below to get started. </Text>
-	    <View style={styles.inputContainer}>
-	      <TextInput style={styles.inputs}
-	          placeholder="Full name"
-	          onChangeText={(name) => this.setState({name})}/>
-	    </View>
-
-
-	    <View style={styles.inputContainer}>
-          <TextInput style={styles.inputs}
-              placeholder="SUID (eg: gitakris)"
-              onChangeText={(suid) => this.setState({suid})}/>
-        </View>
-      </View>
-
-       <View style = {styles.dropdown}>
-      <Dropdown
-		        label='Choose your residence'
-		        data={[
-		        {value: 'Mars'},
-		        {value: '680'},
-		       	{value: 'Xanadu'},
-		        {value: 'Casa'},
-		        {value: 'Bob'},
-		        {value: 'Storey'},
-		        {value: 'Grove'},
-		        {value: 'Slav'},
-		        {value: 'Haus Mitt'},
-		        {value: 'Phi Sig'},
-		        {value: 'Kairos'},
-		        {value: 'EBF'},
-		        {value: 'Synergy'},
-		       	{value: 'Durand'},
-
-		        ]}
-		      />
-		</View>
-		<View style = {styles.buttonSpaceContainer}>
-		<TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
-          <Text style={styles.loginText}>Register</Text>
-        </TouchableHighlight>
-        </View>
-
-
-
-     </View>
-    );
-}
+    }
+    
   }
 }
 
@@ -125,18 +71,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#DCDCDC',
   },
   buttonSpaceContainer: {
-  	flex: 0.5, 
-  	justifyContent: 'center',
-  	alignItems: 'center',
+    flex: 0.5, 
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textboxcontainers: {
     alignItems: 'center',
   },
   header: {
-  	fontSize: 20,
+    fontSize: 20,
     textAlign: 'center',
     margin: 30,
-	},
+  },
   inputContainer: {
       borderBottomColor: '#F5FCFF',
       backgroundColor: '#FFFFFF',
@@ -171,9 +117,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   dropdown: {
-  	flexDirection: 'column',
-  	justifyContent: 'center',
-  	marginLeft: 20,
-  	marginRight: 20,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginLeft: 20,
+    marginRight: 20,
   },
 });
