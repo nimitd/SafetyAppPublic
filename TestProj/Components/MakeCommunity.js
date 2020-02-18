@@ -74,7 +74,7 @@ export default class MakeCommunity extends Component {
           		</ View>
           		<View style={{flex:1, flexDirection: 'column', justifyContent: 'center'}}>
 					<Button onPress = {() => Alert.alert(
-         										'You pressed create.'
+         										'Thanks for creating a community! You are all set for the demo.'
       										)}
 					title = "Create" style={{}} />
 				</ View>

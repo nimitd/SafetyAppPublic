@@ -18,6 +18,9 @@ import EnterPhone from './Components/EnterPhone';
 import Register from './Components/Register'
 import CreateOrJoin from './Components/CreateOrJoin'
 import { Dropdown } from 'react-native-material-dropdown';
+import MakeCommunity from './Components/MakeCommunity'
+import JoinCommunity from './Components/JoinCommunity'
+
 
 // backend connect code
 import Constants from "expo-constants";
@@ -31,7 +34,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {loggedIn: false, registered: false, suid: ""};
+    this.state = {loggedIn: false, registered: false, suid: "", made_community: false, joined_community: false};
   }
 
   login = () => {
@@ -41,6 +44,15 @@ export default class App extends Component {
   register = (id) => {
       this.setState({ registered: true, suid: id });
   }
+
+  clicked_make_or_join_community = (flag) => {
+    if (flag == 0) {
+      this.setState({ made_community: true });
+    } else {
+      this.setState({ joined_community: true });
+    }
+  }
+
 
   render () {
     if (!this.state.registered) {
@@ -53,13 +65,23 @@ export default class App extends Component {
         suid={this.state.suid}
         onLogin={this.login}/>
     }
-    
-    else {
+    else if (!this.state.made_community && !this.state.joined_community) {
       return <CreateOrJoin
+        onCommunityClick={this.clicked_make_or_join_community}
         uri={uri} />
-
     }
-    
+    else if (this.state.made_community) { 
+      return <MakeCommunity
+        uri={uri}/>
+    } else if (this.state.joined_community) {
+      return <JoinCommunity
+        uri={uri}/>
+    } else {
+      return<EnterPhone
+        uri={uri}
+        suid={this.state.suid}
+        onLogin={this.login}/>
+    }
   }
 }
 
