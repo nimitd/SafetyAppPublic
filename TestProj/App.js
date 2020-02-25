@@ -20,6 +20,7 @@ import CreateOrJoin from './Components/CreateOrJoin'
 import { Dropdown } from 'react-native-material-dropdown';
 import MakeCommunity from './Components/MakeCommunity'
 import JoinCommunity from './Components/JoinCommunity'
+import LocationSharing from './Components/locationSharing'
 
 
 // backend connect code
@@ -55,6 +56,10 @@ export default class App extends Component {
 
 
   render () {
+    return <LocationSharing 
+            uri={uri}/>
+
+
     if (!this.state.registered) {
       return <Register
         onRegister={this.register}

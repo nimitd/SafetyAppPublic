@@ -8,6 +8,7 @@ import { Platform,
         Button,
         TouchableHighlight} from 'react-native';
 import EnterCode from './EnterCode';
+import {styles} from '../styles/main_styles'
 
 // const instructions = Platform.select({
 //   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -83,56 +84,3 @@ export default class EnterPhone extends Component {
     
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 40,
-    textAlign: 'center',
-    margin: 10,
-    marginBottom: 30,
-  },
-  instructions: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 10,
-    margin: 10,
-  },
-  buttonSpaceContainer: {
-    flex: 0.5, 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  phonenumber: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    height:45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom:20,
-    width:250,
-    borderRadius:30,
-  },
-  warning: {
-    fontSize: 17,
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 10,
-    margin: 10,
-  },
-  button: {
-    fontSize: 17,
-    margin: 10,
-  }
-});
