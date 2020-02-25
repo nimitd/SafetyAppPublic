@@ -17,15 +17,32 @@ function Separator() {
 
 export default class CreateOrJoin extends Component {
 
+constructor(props) {
+    super(props);
+
+    this.clicked_button=props.onCommunityClick;
+    this.uri = props.uri;
+
+  }
+
+  on_make_button_click = () => { 
+    this.clicked_button(0);
+  }
+
+  on_join_button_click = () => { 
+    this.clicked_button(1);
+  }
+
+
   render() {
     return (
 
       <View style = {styles.container}>
-        <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => Alert.alert('Thanks for creating a community!')}>
+        <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_make_button_click}>
           <Text style={styles.loginText}>Create a Community</Text>
         </TouchableHighlight>
          <Separator/>
-        <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => Alert.alert('Thanks for joining a community!')}>
+        <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_join_button_click}>
           <Text style={styles.loginText}>Join a Community</Text>
         </TouchableHighlight>
 
