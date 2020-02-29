@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 	container: {
 	    flex: 1,
 	    justifyContent: 'center',
-	    backgroundColor: '#DCDCDC',
+	    backgroundColor: 'black',
 	    marginTop: Constants.statusBarHeight,
 	},
 	buttonSpaceContainer: {

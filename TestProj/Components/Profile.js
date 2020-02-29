@@ -22,7 +22,7 @@ import axios from 'axios';
 import {styles} from '../styles/main_styles'
 import {home_styles} from '../styles/home_styles'
 
-export default class Home extends Component {
+export default class Profile extends Component {
 
   constructor() {
     super()
@@ -30,8 +30,8 @@ export default class Home extends Component {
 
 render() {
     return (
-      <View style = {styles.container}>
-        <Text style={styles.loginText} > Hello Home </ Text>
+      <View>
+        <Text style={styles.loginText} > Hello You </ Text>
       </ View>
     );
   }

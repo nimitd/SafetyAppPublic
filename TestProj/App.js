@@ -14,15 +14,19 @@ import {
 
 //import CreateOrJoin from './Components/CreateOrJoin';
 //import * as Components from './Components';
-import EnterPhone from './Components/EnterPhone';
+import EnterPhone from './Components/EnterPhone'
 import Register from './Components/Register'
 import CreateOrJoin from './Components/CreateOrJoin'
-import { Dropdown } from 'react-native-material-dropdown';
+import { Dropdown } from 'react-native-material-dropdown'
 import MakeCommunity from './Components/MakeCommunity'
 import JoinCommunity from './Components/JoinCommunity'
 import LocationSharing from './Components/locationSharing'
 import Loading from './Components/Loading'
 import EnterCode from './Components/EnterCode'
+import Home from './Components/Home'
+import Resources from './Components/Resources'
+import Profile from './Components/Profile'
+
 
 
 // backend connect code
@@ -36,6 +40,7 @@ import { createAppContainer, createSwitchNavigator, StackNavigator, SwitchNaviga
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
@@ -77,11 +82,45 @@ const OnboardingStack = createStackNavigator({
   }
 }, {initialRouteName: 'Landing'})
 
+const App = createBottomTabNavigator({
+  Home: {
+    screen: Home,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="home" size={25} color={tintColor} />
+        )
+    }
+  },
+  Resources: {
+    screen: Resources,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="book" size={25} color={tintColor} />
+        )
+    }
+  },
+  Location: {
+    screen: LocationSharing,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="location-arrow" size={25} color={tintColor} />
+        )
+    }
+  },
+  Profile: {
+    screen: Profile,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="user" size={25} color={tintColor} />
+        )
+    }
+  }
+});
 
 export default createAppContainer(createSwitchNavigator(
   {
     AuthLoading: Loading,
-    Home : LocationSharing,
+    Home : App,
     Onboarding : OnboardingStack,
   },
   {
