@@ -15,11 +15,12 @@ import {
 //import CreateOrJoin from './Components/CreateOrJoin';
 //import * as Components from './Components';
 import EnterPhone from './Components/EnterPhone';
-import Register from './Components/Register'
-import CreateOrJoin from './Components/CreateOrJoin'
+import Register from './Components/Register';
+import CreateOrJoin from './Components/CreateOrJoin';
 import { Dropdown } from 'react-native-material-dropdown';
-import MakeCommunity from './Components/MakeCommunity'
-import JoinCommunity from './Components/JoinCommunity'
+import MakeCommunity from './Components/MakeCommunity';
+import JoinCommunity from './Components/JoinCommunity';
+import PublishEvent from './Components/PublishEvent'
 
 
 // backend connect code
@@ -55,33 +56,8 @@ export default class App extends Component {
 
 
   render () {
-    if (!this.state.registered) {
-      return <Register
-        onRegister={this.register}
-        uri={uri}/>
-    } else if (!this.state.loggedIn) {
-      return <EnterPhone
-        uri={uri}
-        suid={this.state.suid}
-        onLogin={this.login}/>
-    }
-    else if (!this.state.made_community && !this.state.joined_community) {
-      return <CreateOrJoin
-        onCommunityClick={this.clicked_make_or_join_community}
-        uri={uri} />
-    }
-    else if (this.state.made_community) { 
-      return <MakeCommunity
-        uri={uri}/>
-    } else if (this.state.joined_community) {
-      return <JoinCommunity
-        uri={uri}/>
-    } else {
-      return<EnterPhone
-        uri={uri}
-        suid={this.state.suid}
-        onLogin={this.login}/>
-    }
+	  return <PublishEvent
+	    uri={uri}/>
   }
 }
 
