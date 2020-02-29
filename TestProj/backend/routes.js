@@ -5,6 +5,12 @@
 var express = require('express')
 var router = express.Router()
 var con = require('./db');
+var drone = require('./drone')
+
+const jwt = require('jsonwebtoken');
+const colors = require('./colors');
+const CHANNEL_ID = 'ck9tuUkzlzPvEaG0'
+const CHANNEL_SECRET = 'DIlVYq9b0cudM1kHxazqU3daZXPhkxuM'
 
 router.get('/hello', (req, res) => {
 	console.log("Received")
@@ -67,35 +73,41 @@ router.post('/updatePhoneNumber', (req, res, callback) => {
     })
 })
 
+router.post('/auth', (req, res, callback) => {
+	console.log("GOT AUTH REQ")
+	const {clientId, name} = req.body;
+	if (!clientId || clientId.length < 1) {
+		console.log("ERROR 1")
+		res.status(400).send('Invalid ID');
+	}
 
-// router.post('/add_user', (req, res) => {
-// 	const values = [ req.body.first_name, 
-//                    req.body.last_name,
-//                    req.body.suid, 
-//                    req.body.phone];
-//     pool.query(`INSERT INTO app_data.users(first_name, last_name, suid, phone_number)
-//               VALUES($1, $2, $3, $4)`,
-//            values, (q_err, q_res) => {
-//           if(q_err) return next(q_err);
-//           res.json(q_res.rows)
-//     })
-// })
+	if (!name || name.length < 1) {
+		console.log("ERROR 2")
+		res.status(400).send('Invalid name');
+	}
+	const token = jwt.sign({
+		client: clientId,
+		channel: drone.CHANNEL_ID,
+		permissions: {
+			"^observable-locations$": {
+				publish: true,
+				subscribe: true,
+				history: 50,
+			}
+		},
+		data: {
+			name,
+			color: colors.get()
+		},
+		exp: Math.floor(Date.now() / 1000) + 60 * 3 // expire in 3 minutes
+	}, drone.CHANNEL_SECRET);
+	console.log(token)
+	res.send(token);
+})
 
 
 
 
-
-
-	// first_name = payload_json.first_name;
-	// last_name = payload_json.last_name;
-	// suid = payload_json.suid;
-	// phone_number = payload_json.phone_number;
-	// console.log("Received payload for:" + first_name + " " 
-	// 	+ last_name + "with suid " + suid + "and phone # " + phone_number);
-	// let insert = "INSERT INTO app_data.users (suid, `first_name`, `last_name`, `phone_number`) VALUES (";
-	// let insert_built = insert + suid + "," + first_name + "," + last_name + "," +  phone_number + ");";
- //  	var query = connection.query(insert_built, function(err, result) {});
- //  	res.send(query);
 
 
 

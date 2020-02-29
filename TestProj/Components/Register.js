@@ -19,13 +19,18 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
+import {styles} from '../styles/main_styles'
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
+
 export default class Register extends Component {
 
   constructor(props) {
     super(props);
 
-    this.register=props.onRegister;
-    this.uri = props.uri;
+    // this.register=props.onRegister;
+    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
     state = {
       first_name   : '',
@@ -36,13 +41,14 @@ export default class Register extends Component {
   }
 
   buttonListener = () => {
+    // Alert.alert("ERROR 1");
     // Send Name and SUID to server for account creation
     const body = {first_name: this.state.first_name, last_name: this.state.last_name,
         suid: this.state.suid, dorm: this.state.dorm};
     console.log(body);
     axios.post(this.uri + '/send_prelim_user_data', body)
         .then(res =>  {
-          this.register(this.state.suid);
+          this.props.navigation.navigate('Phone', {suid: this.state.suid});
         })
         .catch((error) => {
           if (error.response){
@@ -121,71 +127,3 @@ render() {
     );
   }
 }
-
-const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#DCDCDC',
-  },
-  buttonSpaceContainer: {
-  	flex: 0.5, 
-  	justifyContent: 'center',
-  	alignItems: 'center',
-  },
-  textboxcontainers: {
-    alignItems: 'center',
-  },
-  header: {
-  	fontSize: 20,
-    textAlign: 'center',
-    margin: 30,
-	},
-  inputContainer: {
-      borderBottomColor: '#F5FCFF',
-      backgroundColor: '#FFFFFF',
-      borderRadius:30,
-      borderBottomWidth: 1,
-      width:250,
-      height:45,
-      marginBottom:20,
-      flexDirection: 'row',
-      alignItems:'center',
-  },
-  inputs:{
-      height:45,
-      marginLeft:16,
-      borderBottomColor: '#FFFFFF',
-      flex:1,
-  },
-  buttonContainer: {
-    height:45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom:20,
-    width:250,
-    borderRadius:30,
-  },
-  loginButton: {
-    backgroundColor: "maroon",
-  },
-  loginText: {
-    color: 'white',
-    fontSize: 20,
-  },
-  dropdown: {
-  	flexDirection: 'column',
-  	justifyContent: 'center',
-  	marginLeft: 20,
-  	marginRight: 20,
-  },
-});
-
-
-
-
-
-
-
