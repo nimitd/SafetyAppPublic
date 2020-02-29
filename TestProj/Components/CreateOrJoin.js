@@ -8,6 +8,7 @@ import {
 
 } from 'react-native';
 import Constants from 'expo-constants'
+const { manifest } = Constants;
 
 import {styles} from '../styles/main_styles'
 
@@ -22,17 +23,17 @@ export default class CreateOrJoin extends Component {
 constructor(props) {
     super(props);
 
-    this.clicked_button=props.onCommunityClick;
-    this.uri = props.uri;
+    // this.clicked_button=props.onCommunityClick;
+    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
   }
 
   on_make_button_click = () => { 
-    this.clicked_button(0);
+    this.props.navigation.navigate('Create');
   }
 
   on_join_button_click = () => { 
-    this.clicked_button(1);
+    this.props.navigation.navigate('Join');
   }
 
 

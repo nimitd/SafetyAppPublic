@@ -10,11 +10,6 @@ import { Platform,
 import EnterCode from './EnterCode';
 import {styles} from '../styles/main_styles'
 
-// const instructions = Platform.select({
-//   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-//   android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
-// });
-
 import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
@@ -23,16 +18,11 @@ export default class EnterPhone extends Component {
 
   constructor(props) {
     super(props);
-    this.login = props.onLogin;
-    this.uri = props.uri;
+    // this.login = props.onLogin;
+    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
     this.suid = props.suid;
     this.state = {hasSubmitted: false, phonenumber: '',}
     }
-
-  // let onSubmit = (event) => {
-  //   this.setState({phonenumber: event.text, hasSubmitted: true});
-  // }
-
 
   logPhoneNumber = () => {
     // Send Name and SUID to server for account creation
@@ -40,7 +30,7 @@ export default class EnterPhone extends Component {
     console.log(body);
     axios.post(this.uri + '/updatePhoneNumber', body)
         .then(res =>  {
-          this.login();
+          this.props.navigation.navigate('Code');
         })
         .catch((error) => {
           if (error.response){
@@ -52,35 +42,27 @@ export default class EnterPhone extends Component {
   }
 
   render() {
-    if (!this.state.hasSubmitted){
-      return(
-        <View style = {styles.container}>
-          <KeyboardAvoidingView style={styles.container}>
-              <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
-              <Text style={styles.instructions}>To sign up, please enter your phone number:</Text>
-              <TextInput style={styles.phonenumber}
-                editable
-                maxLength={10}
-                placeholder="000-000-0000"
-                returnKeyType='done'
-                keyboardType='phone-pad'
-                onSubmitEditing= {(event) => this.setState({phonenumber: event.nativeEvent.text})}
-              />
-              <Text style={styles.warning}>(Don't worry, we will never share your number with anyone without your permission.)</Text>
-          </KeyboardAvoidingView>
-          <View style = {styles.buttonSpaceContainer}>
-            <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={(event) => this.setState({hasSubmitted: true})}>
-              <Text style={styles.loginText}>Enter</Text>
-            </TouchableHighlight>
-          </View>
+    return(
+      <View style = {styles.container}>
+        <KeyboardAvoidingView style={styles.container}>
+            <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
+            <Text style={styles.instructions}>To sign up, please enter your phone number:</Text>
+            <TextInput style={styles.phonenumber}
+              editable
+              maxLength={10}
+              placeholder="000-000-0000"
+              returnKeyType='done'
+              keyboardType='phone-pad'
+              onSubmitEditing= {(event) => this.setState({phonenumber: event.nativeEvent.text})}
+            />
+            <Text style={styles.warning}>(Don't worry, we will never share your number with anyone without your permission.)</Text>
+        </KeyboardAvoidingView>
+        <View style = {styles.buttonSpaceContainer}>
+          <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.logPhoneNumber}>
+            <Text style={styles.loginText}>Enter</Text>
+          </TouchableHighlight>
         </View>
-      );
-    }
-    else {
-      return <EnterCode
-        onLogin = {this.logPhoneNumber}
-        />
-    }
-    
+      </View>
+    );
   }
 }

@@ -21,6 +21,8 @@ import { Dropdown } from 'react-native-material-dropdown';
 import MakeCommunity from './Components/MakeCommunity'
 import JoinCommunity from './Components/JoinCommunity'
 import LocationSharing from './Components/locationSharing'
+import Loading from './Components/Loading'
+import EnterCode from './Components/EnterCode'
 
 
 // backend connect code
@@ -28,67 +30,64 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
+
+// navigation imports
+import { createAppContainer, createSwitchNavigator, StackNavigator, SwitchNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createDrawerNavigator } from 'react-navigation-drawer';
+
 const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
-export default class App extends Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {loggedIn: false, registered: false, suid: "", made_community: false, joined_community: false};
+const OnboardingStack = createStackNavigator({
+  Landing: {
+    screen: Register,
+    navigationOptions: {
+    },
+  },
+  Phone: {
+    screen: EnterPhone,
+    navigationOptions: {
+      headerTitle: 'Sign In',
+    },
+  },
+  CreateJoin: {
+    screen: CreateOrJoin,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
+  },
+  Join: {
+    screen: JoinCommunity,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
+  },
+  Create: {
+    screen: MakeCommunity,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
+  },
+  Code: {
+    screen: EnterCode,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
   }
+}, {initialRouteName: 'Landing'})
 
-  login = () => {
-      this.setState({ loggedIn: true });
+
+export default createAppContainer(createSwitchNavigator(
+  {
+    AuthLoading: Loading,
+    Home : LocationSharing,
+    Onboarding : OnboardingStack,
+  },
+  {
+    initialRouteName: 'AuthLoading',
   }
-
-  register = (id) => {
-      this.setState({ registered: true, suid: id });
-  }
-
-  clicked_make_or_join_community = (flag) => {
-    if (flag == 0) {
-      this.setState({ made_community: true });
-    } else {
-      this.setState({ joined_community: true });
-    }
-  }
-
-
-  render () {
-    return <LocationSharing 
-            uri={uri}/>
-
-
-    if (!this.state.registered) {
-      return <Register
-        onRegister={this.register}
-        uri={uri}/>
-    } else if (!this.state.loggedIn) {
-      return <EnterPhone
-        uri={uri}
-        suid={this.state.suid}
-        onLogin={this.login}/>
-    }
-    else if (!this.state.made_community && !this.state.joined_community) {
-      return <CreateOrJoin
-        onCommunityClick={this.clicked_make_or_join_community}
-        uri={uri} />
-    }
-    else if (this.state.made_community) { 
-      return <MakeCommunity
-        uri={uri}/>
-    } else if (this.state.joined_community) {
-      return <JoinCommunity
-        uri={uri}/>
-    } else {
-      return<EnterPhone
-        uri={uri}
-        suid={this.state.suid}
-        onLogin={this.login}/>
-    }
-  }
-}
+));
 
 const styles = StyleSheet.create({
 

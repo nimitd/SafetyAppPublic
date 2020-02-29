@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, TextInput, 
         View, 
         KeyboardAvoidingView, 
-        Button,
+        Button, 
+        Alert,
         TouchableHighlight } from 'react-native';
 
-// const instructions = Platform.select({
-//   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-//   android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
-// });
+import Constants from "expo-constants";
+const { manifest } = Constants;
 
 import {styles} from '../styles/main_styles'
 
@@ -16,12 +15,13 @@ export default class EnterCode extends Component {
 
   constructor(props) {
     super(props);
-
-    this.login = props.onLogin;
-    this.test = props.newthing;
+    // this.login = props.onLogin;
   }
+
   callLogin = () => {
-    this.login();
+    // this.login();
+    console.log("Enter Code PROPS" + this.props.navigation);
+    this.props.navigation.navigate('CreateJoin');
   }
 
   render() {
