@@ -28,7 +28,6 @@ import Resources from './Components/Resources'
 import Profile from './Components/Profile'
 
 
-
 // backend connect code
 import Constants from "expo-constants";
 const { manifest } = Constants;
