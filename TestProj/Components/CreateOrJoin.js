@@ -8,6 +8,9 @@ import {
 
 } from 'react-native';
 import Constants from 'expo-constants'
+const { manifest } = Constants;
+
+import {styles} from '../styles/main_styles'
 
 
 function Separator() { 
@@ -20,17 +23,17 @@ export default class CreateOrJoin extends Component {
 constructor(props) {
     super(props);
 
-    this.clicked_button=props.onCommunityClick;
-    this.uri = props.uri;
+    // this.clicked_button=props.onCommunityClick;
+    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
   }
 
   on_make_button_click = () => { 
-    this.clicked_button(0);
+    this.props.navigation.navigate('Create');
   }
 
   on_join_button_click = () => { 
-    this.clicked_button(1);
+    this.props.navigation.navigate('Join');
   }
 
 
@@ -38,79 +41,19 @@ constructor(props) {
     return (
 
       <View style = {styles.container}>
-        <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_make_button_click}>
-          <Text style={styles.loginText}>Create a Community</Text>
-        </TouchableHighlight>
-         <Separator/>
-        <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_join_button_click}>
-          <Text style={styles.loginText}>Join a Community</Text>
-        </TouchableHighlight>
-
-
+        <View style = {styles.buttonSpaceContainer}>
+          <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_make_button_click}>
+            <Text style={styles.loginText}>Create a Community</Text>
+          </TouchableHighlight>
+        </View>
+        <Separator/>
+        <View style = {styles.buttonSpaceContainer}>
+          <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_join_button_click}>
+            <Text style={styles.loginText}>Join a Community</Text>
+          </TouchableHighlight>
+        </View>
       </View>
       
     );
   }
 }
-
-const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   backgroundColor: '#F5FCFF',
-  // },
-  container: {
-    flex: 1,
-    marginTop: Constants.statusBarHeight,
-    alignItems: 'center',
-    backgroundColor: '#DCDCDC',
-    justifyContent: 'center'
-  },
-  buttoncontainer: {
-  	flex: 1,
-  	justifyContent: 'center',
-  	marginTop: Constants.statusBarHeight,
-  	marginHorizontal: 16,
-    borderRadius: 20,
-  },
-  buttonContainer: {
-    height:45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom:20,
-    width:350,
-    borderRadius:30,
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-  separator: {
-  	marginVertical: 16,
-  	borderBottomColor: '#737373',
-  	borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  button: {
-  	backgroundColor: "crimson",
-  	height: 50,
-  	flex: 0.25,
-  	textAlign: 'justify',
-  	flexDirection: 'column',
-  	justifyContent: 'space-around',
-  },
-  loginButton: {
-    backgroundColor: "maroon",
-  },
-  loginText: {
-    color: 'white',
-    fontSize: 25,
-  },
-});

@@ -14,13 +14,18 @@ import {
 
 //import CreateOrJoin from './Components/CreateOrJoin';
 //import * as Components from './Components';
-import EnterPhone from './Components/EnterPhone';
-import Register from './Components/Register';
-import CreateOrJoin from './Components/CreateOrJoin';
-import { Dropdown } from 'react-native-material-dropdown';
-import MakeCommunity from './Components/MakeCommunity';
-import JoinCommunity from './Components/JoinCommunity';
-import PublishEvent from './Components/PublishEvent'
+import EnterPhone from './Components/EnterPhone'
+import Register from './Components/Register'
+import CreateOrJoin from './Components/CreateOrJoin'
+import { Dropdown } from 'react-native-material-dropdown'
+import MakeCommunity from './Components/MakeCommunity'
+import JoinCommunity from './Components/JoinCommunity'
+import LocationSharing from './Components/locationSharing'
+import Loading from './Components/Loading'
+import EnterCode from './Components/EnterCode'
+import Home from './Components/Home'
+import Resources from './Components/Resources'
+import Profile from './Components/Profile'
 
 
 // backend connect code
@@ -28,38 +33,99 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
+
+// navigation imports
+import { createAppContainer, createSwitchNavigator, StackNavigator, SwitchNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createDrawerNavigator } from 'react-navigation-drawer';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
-export default class App extends Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {loggedIn: false, registered: false, suid: "", made_community: false, joined_community: false};
+const OnboardingStack = createStackNavigator({
+  Landing: {
+    screen: Register,
+    navigationOptions: {
+    },
+  },
+  Phone: {
+    screen: EnterPhone,
+    navigationOptions: {
+      headerTitle: 'Sign In',
+    },
+  },
+  CreateJoin: {
+    screen: CreateOrJoin,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
+  },
+  Join: {
+    screen: JoinCommunity,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
+  },
+  Create: {
+    screen: MakeCommunity,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
+  },
+  Code: {
+    screen: EnterCode,
+    navigationOptions: {
+      headerTitle: 'Create Account',
+    },
   }
+}, {initialRouteName: 'Landing'})
 
-  login = () => {
-      this.setState({ loggedIn: true });
-  }
-
-  register = (id) => {
-      this.setState({ registered: true, suid: id });
-  }
-
-  clicked_make_or_join_community = (flag) => {
-    if (flag == 0) {
-      this.setState({ made_community: true });
-    } else {
-      this.setState({ joined_community: true });
+const App = createBottomTabNavigator({
+  Home: {
+    screen: Home,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="home" size={25} color={tintColor} />
+        )
+    }
+  },
+  Resources: {
+    screen: Resources,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="book" size={25} color={tintColor} />
+        )
+    }
+  },
+  Location: {
+    screen: LocationSharing,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="location-arrow" size={25} color={tintColor} />
+        )
+    }
+  },
+  Profile: {
+    screen: Profile,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+          <Icon name="user" size={25} color={tintColor} />
+        )
     }
   }
+});
 
-
-  render () {
-	  return <PublishEvent
-	    uri={uri}/>
+export default createAppContainer(createSwitchNavigator(
+  {
+    AuthLoading: Loading,
+    Home : App,
+    Onboarding : OnboardingStack,
+  },
+  {
+    initialRouteName: 'AuthLoading',
   }
-}
+));
 
 const styles = StyleSheet.create({
 
