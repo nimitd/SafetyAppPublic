@@ -42,7 +42,15 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// Redux App
+import { connect } from 'react-redux';
+import { changeSUID } from './actions/suids';
+import { bindActionCreators } from 'redux';
+
+
+// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// ./ngrok http 3000
+const uri = 'http://5c432761.ngrok.io';
 
 const OnboardingStack = createStackNavigator({
   Landing: {
@@ -82,7 +90,7 @@ const OnboardingStack = createStackNavigator({
   }
 }, {initialRouteName: 'Landing'})
 
-const App = createBottomTabNavigator({
+const MainApp = createBottomTabNavigator({
   Home: {
     screen: Home,
     navigationOptions: {
@@ -117,16 +125,51 @@ const App = createBottomTabNavigator({
   }
 });
 
-export default createAppContainer(createSwitchNavigator(
+
+// const mapStateToProps = state => ({
+//   suid: state.suid,
+// });
+
+// const ActionCreators = Object.assign(
+//   {},
+//   changeSUID,
+// );
+
+// const mapDispatchToProps = dispatch => ({
+//   actions: bindActionCreators(ActionCreators, dispatch),
+// });
+
+
+const Switch = createAppContainer(createSwitchNavigator(
   {
-    AuthLoading: Loading,
-    Home : App,
-    Onboarding : OnboardingStack,
+    AuthLoading: {screen: Loading},
+    Home : {screen: MainApp},
+    Onboarding : {screen: OnboardingStack},
   },
   {
     initialRouteName: 'AuthLoading',
   }
 ));
+
+import { Provider } from 'react-redux';
+import configureStore from './store/configureStore';
+
+const store = configureStore()
+
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <View style={styles.container}>
+          <Switch />
+        </View>
+      </Provider>
+    );
+  }
+}
+
+
+// export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 const styles = StyleSheet.create({
 

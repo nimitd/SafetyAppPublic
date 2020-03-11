@@ -22,14 +22,43 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const Scaledrone = require('scaledrone-react-native');
 const SCALEDRONEID = 'ck9tuUkzlzPvEaG0'
 
-export default class LocationSharing extends Component {
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
+// import { bindActionCreators } from 'redux';
+
+class LocationSharing extends Component {
 
   constructor(props) {
     super();
     this.state = {
       members: []
     };
-    this.uri = props.uri
+    // this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+    this.uri = `http://5c432761.ngrok.io`;
+    this.cur_members = new Set();
+    // this.notActiveMembers = new Set();
+    // this.notActiveMemberNames = new Set();
+    this.subscribed_to_rooms = [];
+  }
+
+  historyUpdateLocation(data) {
+    const {members} = this.state;
+    const member = members.find(m => m.id === data.suid);
+    if (!member) {
+      // a history message might be sent from a user who is no longer online
+      console.log("couldn't find that member with suid");
+      location = new AnimatedRegion({
+        latitude: data.latitude,
+        longitude: data.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA
+      });
+      toAddMember = {suid: data.suid, location: location};
+      this.notActiveMembers.add(toAddMember);
+      this.notActiveMemberNames.add(data.suid);
+      this.forceUpdate();
+    }
   }
 
   updateLocation(data, memberId) {
@@ -37,8 +66,15 @@ export default class LocationSharing extends Component {
     const member = members.find(m => m.id === memberId);
     if (!member) {
       // a history message might be sent from a user who is no longer online
+      console.log("couldn't find that member");
       return;
     }
+    // if found the member, check if they are in the notActiveMembers and if so remove
+    // if (this.notActiveMemberNames.has(memberId))  {
+    //   this.notActiveMemberNames.delete(memberId);
+    // }
+    // console.log(this.notActiveMemberNames);
+
     if (member.location) {
       member.location.timing({
         latitude: data.latitude,
@@ -55,6 +91,21 @@ export default class LocationSharing extends Component {
     }
   }
 
+  add_and_updateLocation(data, member)  {
+    // console.log("Our members: " + this.state.members);
+    if (!this.cur_members.has(member.id)) {
+          this.cur_members.add(member.id);
+          const members = this.state.members.slice(0);
+          members.push(member);
+          this.setState({members});
+    }
+    this.updateLocation(data, member.id)
+  }
+
+  set_subscribed(res) {
+      this.subscribed_to_rooms = res.data;
+  }
+
   startLocationTracking(callback) {
     navigator.geolocation.watchPosition(
       callback,
@@ -67,9 +118,26 @@ export default class LocationSharing extends Component {
     );
   }
 
+  createTempMembers() {
+    for (let member of this.notActiveMembers) {
+      const {suid, location} = member;
+      if (this.notActiveMemberNames.has(suid))  {
+        console.log("making temporary member label");
+        return (
+          <View key={suid} style={styles.member}>
+            <View style={[styles.avatar, {backgroundColor: '#000000'}]}/>
+            <Text style={styles.memberName}>{suid}</Text>
+          </View>
+        );
+      }
+    }      
+  }
+
   createMembers() {
     const {members} = this.state;
-    return members.map(member => {
+    // var temps = this.createTempMembers();
+    toReturn = members.map(member => {
+      // console.log(member);
       const {name, color} = member.authData;
       return (
         <View key={member.id} style={styles.member}>
@@ -78,14 +146,38 @@ export default class LocationSharing extends Component {
         </View>
       );
     });
+    // return toReturn.concat(temps);
+    return toReturn;
+  }
+
+  createTempMarkers() {
+    for (let member of this.notActiveMembers) {
+      const {suid, location} = member;
+      console.log(this.notActiveMemberNames);
+      if (this.notActiveMemberNames.has(suid))  {
+        console.log("making temporary marker");
+        return (
+          <Marker.Animated
+            key={suid}
+            identifier={suid}
+            coordinate={location}
+            pinColor={'#000000'}
+            title={suid}
+          />
+        );
+      }      
+    };
   }
 
   createMarkers() {
+    // for those that don't exist
+    // var temps = this.createTempMarkers();
     const {members} = this.state;
     const membersWithLocations = members.filter(m => !!m.location);
-    return membersWithLocations.map(member => {
+    var markers = membersWithLocations.map(member => {
       const {id, location, authData} = member;
       const {name, color} = authData;
+      console.log("id is: " + id);
       return (
         <Marker.Animated
           key={id}
@@ -96,6 +188,18 @@ export default class LocationSharing extends Component {
         />
       );
     });
+    // var toReturn = markers.concat(temps);
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
+
+    // console.log(Object.size(toReturn))
+    // return toReturn;
+    return markers;
   }
 
   fitToMarkersToMap() {
@@ -103,7 +207,14 @@ export default class LocationSharing extends Component {
     this.map.fitToSuppliedMarkers(members.map(m => m.id), true);
   }
 
+  authAndName(clientId, name) {
+    // this.suid = name;
+    // console.log("Auth and Name prints out " + name);
+    return doAuthRequest(clientId, name, this.uri);
+  }
+
   componentDidMount() {
+    console.log("URI: " + uri);
     Permissions.askAsync(Permissions.LOCATION);
     const drone = new Scaledrone(SCALEDRONEID);
     drone.on('error', error => console.error(error));
@@ -112,61 +223,140 @@ export default class LocationSharing extends Component {
       if (error) {
         return console.error(error);
       }
-      Alert.prompt(
-        'Please insert your name',
-        null,
-        name => doAuthRequest(drone.clientId, name, this.uri).then(
+        this.authAndName(drone.clientId, this.props.suid.suid).then(
           jwt => {drone.authenticate(jwt)}
-        )
       );
     });
-    const room = drone.subscribe('observable-locations', {
-      historyCount: 50 // load 50 past messages
+
+    // Here, room is the individual's personal room
+    const room = drone.subscribe('observable-' + this.props.suid.suid, {
+      historyCount: 1 // load 50 past messages
     });
     room.on('open', error => {
       if (error) {
         return console.error(error);
       }
+
+      // received past message
+      // room.on('history_message', message => {
+      //     // console.log("Past messages triggered");
+      //     console.log("HISTORY message for: " + message.data.suid + " lattitude at: " + message.data.latitude + " longitude at: " + message.data.longitude);
+      //     self.historyUpdateLocation(message.data, message.clientId);
+      //   }
+      // );
+      // received new message
+      room.on('data', (data, member) => {
+          console.log("NEW message for: " + member.authData.name + " lattitude at: " + data.latitude + " longitude at: " + data.longitude);
+          this.add_and_updateLocation(data, member);
+        }
+      );
+      // new member subscribed to yours
+      room.on('member_join', member => {
+        navigator.geolocation.getCurrentPosition(
+           (position) => {
+              const {latitude, longitude} = position.coords;
+              console.log('observable-' + this.props.suid.suid);
+              suid = this.props.suid.suid;
+              drone.publish({
+                  room: 'observable-' + suid,
+                  message: {latitude, longitude, suid}
+                });
+            }, error => console.error(error));
+      });
+
+      // start publishing locations to own room
       this.startLocationTracking(position => {
         const {latitude, longitude} = position.coords;
         // publish device's new location
+        suid = this.props.suid.suid;
         drone.publish({
-          room: 'observable-locations',
-          message: {latitude, longitude}
+          room: 'observable-' + suid,
+          message: {latitude, longitude, suid}
         });
       });
     });
-    // received past message
-    room.on('history_message', message =>
-      this.updateLocation(message.data, message.clientId)
-    );
-    // received new message
-    room.on('data', (data, member) =>
-      this.updateLocation(data, member.id)
-    );
-    // array of all connected members
-    room.on('members', members =>
-      this.setState({members})
-    );
-    // new member joined room
-    room.on('member_join', member => {
-      const members = this.state.members.slice(0);
-      members.push(member);
-      this.setState({members});
-    });
-    // member left room
-    room.on('member_leave', member => {
-      const members = this.state.members.slice(0);
-      const index = members.findIndex(m => m.id === member.id);
-      if (index !== -1) {
-        members.splice(index, 1);
-        this.setState({members});
-      }
-    });
+    // // received past message
+    // room.on('history_message', message => {
+    //   // console.log("Past messages triggered");
+    //   self.updateLocation(message.data, message.clientId);
+    // }
+    // );
+    // // received new message
+    // room.on('data', (data, member) => {
+    //     console.log("NEW message lattitude at: " + data.latitude + " longitude at: " + data.longitude);
+    //     this.add_and_updateLocation(data, member);
+    //   }
+    // );
+    // // new member subscribed to yours
+    // room.on('member_join', member => {
+    //   navigator.geolocation.getCurrentPosition(
+    //      (position) => {
+    //         const {latitude, longitude} = position.coords;
+    //         drone.publish({
+    //             room: 'observable-' + this.props.suid.suid,
+    //             message: {latitude, longitude}
+    //           });
+    //       }, error => console.error(error));
+    // });
+
+    // subscribing to other people's rooms (when other's share location with us)
+    // from db, get all subscribed_to rooms (suids technically, prepend observable-)
+
+
+      self = this;
+      axios.post(self.uri + '/get_rooms_sd', {suid: self.props.suid.suid})
+          .then(res =>  {
+            console.log(res.data);
+            res.data.forEach(function (item, index) {
+              // console.log("DEBUG: inside for each");
+              console.log(item.room_id);
+              const susbribed = drone.subscribe('observable-' + item.room_id, {
+                historyCount: 1 // load 50 past messages
+              });
+              // received past message
+              susbribed.on('history_message', message =>  {
+                console.log("HISTORY message for: " + message.data.suid + " lattitude at: " + message.data.latitude + " longitude at: " + message.data.longitude);
+                // console.log('hist mess memb data: ' + message.member.clientData);
+                // console.log('hist mess memb id: ' + message.member.id);
+                // self.historyUpdateLocation(message.data, message.data.suid);
+              }
+              );
+              // received new message
+              susbribed.on('data', (data, member) =>
+                self.add_and_updateLocation(data, member)
+              );
+              // someone leaves the room u are following - check if its publisher
+              room.on('member_leave', member => {
+                console.log("REMOVING SOMEONE");
+                if (member.id == item.room_id)  {
+                  const members = self.state.members.slice(0);
+                  const index = members.findIndex(m => m.id === member.id);
+                  if (index !== -1) {
+                    members.splice(index, 1);
+                    self.setState({members});
+                    console.log("REACHES DELETE");
+                    self.forceUpdate();
+                  }
+                }
+              });
+            }); 
+          })
+          .catch((error) => {
+            if (error.response){
+              if (error.response.status == 401) {
+                Alert.alert("User with SUID already exists, please enter unique SUID")
+              }
+            console.log(error)
+            }
+        });    
+    // iterate through all rooms, subscribe to each
+    
+    
+    // set member list based on this iteration ...
   }
 
   render() {
-    return (
+    return  (
       <View style={styles.container}>
         <MapView
           style={styles.map}
@@ -200,7 +390,7 @@ function doAuthRequest(clientId, name, uri) {
     let status;
     return axios.post(uri + "/auth", {clientId: clientId, name: name})
       .then(res => {
-      status = res.status;  
+      status = res.status; 
       return res.data;
     }).then(text => {
       if (status === 200) {
@@ -210,6 +400,16 @@ function doAuthRequest(clientId, name, uri) {
       }
     }).catch(error => console.error(error));
   }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LocationSharing);
 
 const styles = StyleSheet.create({
   container: {
