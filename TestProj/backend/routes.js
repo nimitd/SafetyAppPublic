@@ -12,9 +12,37 @@ const colors = require('./colors');
 const CHANNEL_ID = 'ck9tuUkzlzPvEaG0'
 const CHANNEL_SECRET = 'DIlVYq9b0cudM1kHxazqU3daZXPhkxuM'
 
-router.get('/hello', (req, res) => {
+router.post('/profile_mount', (req, res) => {
+	var suid = req.body.suid;
+	console.log("Received: " + suid);
+	con.query("SELECT first_name, last_name, phone_number, community FROM app_data.users as u LEFT JOIN app_data.memberships as c ON u.suid = c.suid WHERE u.suid ='" + suid + "'",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          console.log("here");
+          res.send(q_res);
+          console.log("here2");
+      })
+	//res.json('Returning back some message');
+})
+
+router.post('/test_post_harrison', (req, res) => {
+	var name = req.body.first_name;
+	console.log("Received" + name);
+	res.json('Returning back some message');
+})
+
+router.post('/hello', (req, res) => {
 	console.log("Received")
 	res.json('Returning back some message')
+})
+
+router.get('/harrison', (req, res) => {
+	console.log("Querying user data!");
+  	con.query(`SELECT * FROM app_data.users;`,
+          (q_err, q_res) => {
+          if(q_err) return next(q_err);
+          res.send(q_res)
+    })
 })
 
 router.post('/test_post', (req, res) => {

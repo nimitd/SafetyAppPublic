@@ -18,10 +18,16 @@ const instructions = Platform.select({
 });
 
 
+
 export default class JoinCommunity extends Component {
 	constructor(props) {
 	    super(props);
 		this.state = {commName: '', pass: '', pass2: '', location: ''};
+  	}
+
+  	buttonListener = () => {
+  		Alert.alert('Thanks for joining a community! Welcome to our safety app!');
+  		this.props.navigation.navigate('Profile', {suid: this.state.suid});
   	}
 
 	render() {
@@ -60,9 +66,7 @@ export default class JoinCommunity extends Component {
 	          				value={this.state.pass}/>
 	          		</KeyboardAvoidingView>
 	          		<View style={{flex:1, flexDirection: 'column', justifyContent: 'center'}}>
-						<Button onPress = {() => Alert.alert(
-	         										'Thanks for joining a community! You are all set for the demo.'
-	      										)}
+						<Button onPress = {() => this.buttonListener()}
 						title = "Join" style={{}} />
 					</ View>
 			</View>

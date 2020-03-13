@@ -22,6 +22,11 @@ export default class MakeCommunity extends Component {
 		this.state = {commName: '', pass: '', pass2: '', location: ''};
   	}
 
+	buttonListener = () => {
+  		Alert.alert('Thanks for making a community! Welcome to our safety app!');
+  		this.props.navigation.navigate('Profile', {suid: this.state.suid});
+  	}
+
 	render() {
 		return (
 			<View style={styles.page}>
@@ -75,9 +80,7 @@ export default class MakeCommunity extends Component {
 					</ View>
           		</ View>
           		<View style={{flex:1, flexDirection: 'column', justifyContent: 'center'}}>
-					<Button onPress = {() => Alert.alert(
-         										'Thanks for creating a community! You are all set for the demo.'
-      										)}
+					<Button onPress = {() => this.buttonListener()}
 					title = "Create" style={{}} />
 				</ View>
 			</View>
