@@ -20,8 +20,8 @@ export default function SwipeToDelete(props) {
 
     var arr = props.array;
 
-    console.log("In swipe.");
-    console.log(arr);
+    //console.log("In swipe.");
+    //console.log(arr);
 
     var rowTranslateAnimatedValues = {};
     
@@ -34,6 +34,8 @@ export default function SwipeToDelete(props) {
             .fill('')
             .map((_, i) => ({ key: `${i}`, text: props.array[i] }))
     );
+
+    //console.log(listData);
 
     const onSwipeValueChange = swipeData => {
         var { key, value } = swipeData;

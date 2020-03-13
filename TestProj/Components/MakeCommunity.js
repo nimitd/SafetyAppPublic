@@ -23,7 +23,6 @@ export default class MakeCommunity extends Component {
   	}
 
 	buttonListener = () => {
-  		Alert.alert('Thanks for making a community! Welcome to our safety app!');
   		this.props.navigation.navigate('Profile', {suid: this.state.suid});
   	}
 

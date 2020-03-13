@@ -26,7 +26,6 @@ export default class JoinCommunity extends Component {
   	}
 
   	buttonListener = () => {
-  		Alert.alert('Thanks for joining a community! Welcome to our safety app!');
   		this.props.navigation.navigate('Profile', {suid: this.state.suid});
   	}
 

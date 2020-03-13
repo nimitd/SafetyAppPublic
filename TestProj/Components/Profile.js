@@ -9,17 +9,20 @@ import {
   Text,
   View,
   TextInput,
+  SafeAreaView,
   Button, 
   TouchableHighlight,
   Alert,
   Picker,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { SwipeRow } from 'react-native-swipe-list-view';
 import CreateOrJoin from './CreateOrJoin';
 import { Dropdown } from 'react-native-material-dropdown';
 import SwipeToDelete from './swipeToDelete';
+import JoinCommunity from './JoinCommunity'
 
 import Constants from "expo-constants";
 const { manifest } = Constants;
@@ -31,6 +34,15 @@ const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 import {styles} from '../styles/main_styles';
 import {home_styles} from '../styles/home_styles';
 import {profile_styles} from '../styles/profile_styles';
+
+function Item({ title }) {
+    console.log(title);
+    return (
+      <View style={styles2.item}>
+        <Text style={styles2.title}>{title}</Text>
+      </View>
+    );
+  }
 
 export default class Profile extends Component {
 
@@ -45,11 +57,9 @@ export default class Profile extends Component {
       editable : false,
       title : 'Edit My Information',
       color : 'grey',
-      communities : '',
+      communities : [],
       events : ['Nimit On Call 3/20', 'Full Moon On the Quad', 'Nomad', 'Xanadu Special D'],
     }
-
-
 
     this.getData();
 
@@ -95,6 +105,14 @@ renderExample = (arr) => {
     }
   }
 
+  joinCommunity = () => {
+      this.props.navigation.navigate('Join', {suid: this.state.suid});
+  }
+
+  makeCommunity = () => {
+      this.props.navigation.navigate('MakeCommunity', {suid: this.state.suid});
+  }
+
   self = this;
 
   getData = () => {
@@ -104,30 +122,27 @@ renderExample = (arr) => {
 
     axios.post(uri + '/profile_mount', body)
       .then(res =>  {
-        //console.log(res.data);
 
         var communitiesArray = [];
 
         res.data.forEach(function (item, index) {
-              // console.log("DEBUG: inside for each");
               console.log(item.community);
               communitiesArray.push(item.community);
           });
 
-        console.log(communitiesArray);
+        var dataArray = Array(communitiesArray.length)
+            .fill('')
+            .map((_, i) => ({ title: communitiesArray[i], key: `${i}`,  }));
 
         this.setState({first_name : res.data[0].first_name});
         this.setState({last_name : res.data[0].last_name});
         this.setState({phonenumber : res.data[0].phone_number});
-        this.setState({communities : communitiesArray});
-
-        console.log(this.state.communities);
+        this.setState({communities : dataArray});
+        this.setState({data : dataArray});
 
       }).catch((error) => {
           console.log(error);
     });
-
-    //Alert.alert({state.display_name});
   }
 
   componentDidMount() {
@@ -191,7 +206,35 @@ renderExample = (arr) => {
 
           <Text style={profile_styles.profileSectionTitle}>My Communities</Text>
 
-          {this.renderExample(this.state.communities)}
+          <SafeAreaView style={styles2.container}>
+            <FlatList
+              // ItemSeparatorComponent={Platform.OS !== 'android' && ({highlighted}) => (
+              //   <View style={[style.separator, highlighted && {marginLeft: 0}]} />
+              // )}
+              data={this.state.communities}
+              renderItem={({item, index, separators}) => (
+                <TouchableHighlight
+                  //onPress={() => this._onPress(item)}
+                  onShowUnderlay={separators.highlight}
+                  onHideUnderlay={separators.unhighlight}>
+                  <View style={styles2.item}>
+                    <Text style={styles2.title}>{item.title}</Text>
+                  </View>
+                </TouchableHighlight>
+              )}
+            />
+
+          </SafeAreaView>
+
+          <Button
+                title='Join Another Community'
+                onPress = {() => this.joinCommunity()}
+              />
+
+          <Button
+                title='Create a New Community'
+                onPress = {() => this.makeCommunity()}
+              />
 
           <View style={profile_styles.profileSeparator}></View>
 
@@ -249,4 +292,23 @@ const styles1 = StyleSheet.create({
         backgroundColor: 'red',
         right: 0,
     },
+});
+
+const styles2 = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  item: {
+    height: 45,
+    backgroundColor: 'grey',
+    padding: 10,
+    marginVertical: 10,
+    textAlign: 'center',
+    //fontSize: '20',
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'black',
+  },
 });
