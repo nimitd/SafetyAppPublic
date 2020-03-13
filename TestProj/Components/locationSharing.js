@@ -35,10 +35,10 @@ class LocationSharing extends Component {
       members: []
     };
     // this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-    this.uri = `http://5c432761.ngrok.io`;
+    // this.uri = `http://bc13f145.ngrok.io`;
     this.cur_members = new Set();
-    // this.notActiveMembers = new Set();
-    // this.notActiveMemberNames = new Set();
+    this.notActiveMembers = new Set();
+    this.notActiveMemberNames = new Set();
     this.subscribed_to_rooms = [];
   }
 
@@ -70,10 +70,10 @@ class LocationSharing extends Component {
       return;
     }
     // if found the member, check if they are in the notActiveMembers and if so remove
-    // if (this.notActiveMemberNames.has(memberId))  {
-    //   this.notActiveMemberNames.delete(memberId);
-    // }
-    // console.log(this.notActiveMemberNames);
+    if (this.notActiveMemberNames.has(memberId))  {
+      this.notActiveMemberNames.delete(memberId);
+    }
+    console.log(this.notActiveMemberNames);
 
     if (member.location) {
       member.location.timing({
@@ -135,7 +135,7 @@ class LocationSharing extends Component {
 
   createMembers() {
     const {members} = this.state;
-    // var temps = this.createTempMembers();
+    var temps = this.createTempMembers();
     toReturn = members.map(member => {
       // console.log(member);
       const {name, color} = member.authData;
@@ -146,8 +146,8 @@ class LocationSharing extends Component {
         </View>
       );
     });
-    // return toReturn.concat(temps);
-    return toReturn;
+    return toReturn.concat(temps);
+    // return toReturn;
   }
 
   createTempMarkers() {
@@ -171,7 +171,7 @@ class LocationSharing extends Component {
 
   createMarkers() {
     // for those that don't exist
-    // var temps = this.createTempMarkers();
+    var temps = this.createTempMarkers();
     const {members} = this.state;
     const membersWithLocations = members.filter(m => !!m.location);
     var markers = membersWithLocations.map(member => {
@@ -188,7 +188,7 @@ class LocationSharing extends Component {
         />
       );
     });
-    // var toReturn = markers.concat(temps);
+    var toReturn = markers.concat(temps);
     Object.size = function(obj) {
         var size = 0, key;
         for (key in obj) {
@@ -198,8 +198,8 @@ class LocationSharing extends Component {
     };
 
     // console.log(Object.size(toReturn))
-    // return toReturn;
-    return markers;
+    return toReturn;
+    // return markers;
   }
 
   fitToMarkersToMap() {
@@ -210,7 +210,7 @@ class LocationSharing extends Component {
   authAndName(clientId, name) {
     // this.suid = name;
     // console.log("Auth and Name prints out " + name);
-    return doAuthRequest(clientId, name, this.uri);
+    return doAuthRequest(clientId, name, uri);
   }
 
   componentDidMount() {
@@ -316,9 +316,9 @@ class LocationSharing extends Component {
               // received past message
               susbribed.on('history_message', message =>  {
                 console.log("HISTORY message for: " + message.data.suid + " lattitude at: " + message.data.latitude + " longitude at: " + message.data.longitude);
-                // console.log('hist mess memb data: ' + message.member.clientData);
-                // console.log('hist mess memb id: ' + message.member.id);
-                // self.historyUpdateLocation(message.data, message.data.suid);
+                console.log('hist mess memb data: ' + message.member.clientData);
+                console.log('hist mess memb id: ' + message.member.id);
+                self.historyUpdateLocation(message.data, message.data.suid);
               }
               );
               // received new message
