@@ -5,16 +5,24 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  TouchableHighlight,
   Alert,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import * as Permissions from 'expo-permissions';
+import Modal from "react-native-modal";
+
+import { ListItem } from 'react-native-elements'
+
 
 import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+uri = `http://7ff433b9.ngrok.io`;
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.0922;
@@ -32,19 +40,42 @@ class LocationSharing extends Component {
   constructor(props) {
     super();
     this.state = {
-      members: []
+      members: [],
+      isVisible: false,
+      subscribers: []
     };
-    // this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
     // this.uri = `http://bc13f145.ngrok.io`;
     this.cur_members = new Set();
     this.notActiveMembers = new Set();
     this.notActiveMemberNames = new Set();
-    this.subscribed_to_rooms = [];
+  }
+
+  getSubscribers() {
+    self = this;
+    axios.post(uri + '/get_subscribers', {suid: self.props.suid.suid})
+          .then(res =>  {
+            console.log(res.data);
+            subs = self.state.subscribers;
+            res.data.forEach(function (item, index) {
+              // do something
+              console.log("suid getting back is: " + item.suid);
+              subs.push(item.suid);
+            });
+            self.setState({subscribers: subs});
+          }) 
+          .catch((error) => {
+            if (error.response){
+              if (error.response.status == 401) {
+                Alert.alert("User with SUID already exists, please enter unique SUID")
+              }
+            console.log(error)
+            }
+        });    
   }
 
   historyUpdateLocation(data) {
     const {members} = this.state;
-    const member = members.find(m => m.id === data.suid);
+    const member = members.find(m => m.authData.name === data.suid);
     if (!member) {
       // a history message might be sent from a user who is no longer online
       console.log("couldn't find that member with suid");
@@ -63,17 +94,17 @@ class LocationSharing extends Component {
 
   updateLocation(data, memberId) {
     const {members} = this.state;
-    const member = members.find(m => m.id === memberId);
+    const member = members.find(m => m.authData.name === memberId);
     if (!member) {
       // a history message might be sent from a user who is no longer online
       console.log("couldn't find that member");
       return;
     }
     // if found the member, check if they are in the notActiveMembers and if so remove
-    if (this.notActiveMemberNames.has(memberId))  {
-      this.notActiveMemberNames.delete(memberId);
-    }
-    console.log(this.notActiveMemberNames);
+    // if (this.notActiveMemberNames.has(memberId))  {
+    //   this.notActiveMemberNames.delete(memberId);
+    // }
+    // console.log(this.notActiveMemberNames);
 
     if (member.location) {
       member.location.timing({
@@ -93,18 +124,19 @@ class LocationSharing extends Component {
 
   add_and_updateLocation(data, member)  {
     // console.log("Our members: " + this.state.members);
-    if (!this.cur_members.has(member.id)) {
-          this.cur_members.add(member.id);
+    console.log("MEMBER.ID: " + member.authData.name);
+    if (!this.cur_members.has(member.authData.name)) {
+          this.cur_members.add(member.authData.name);
           const members = this.state.members.slice(0);
           members.push(member);
-          this.setState({members});
+          this.setState({members: members});
     }
-    this.updateLocation(data, member.id)
+    this.updateLocation(data, member.authData.name)
   }
 
-  set_subscribed(res) {
-      this.subscribed_to_rooms = res.data;
-  }
+  // set_subscribed(res) {
+  //     this.subscribed_to_rooms = res.data;
+  // }
 
   startLocationTracking(callback) {
     navigator.geolocation.watchPosition(
@@ -140,14 +172,14 @@ class LocationSharing extends Component {
       // console.log(member);
       const {name, color} = member.authData;
       return (
-        <View key={member.id} style={styles.member}>
+        <View key={member.authData.name} style={styles.member}>
           <View style={[styles.avatar, {backgroundColor: color}]}/>
           <Text style={styles.memberName}>{name}</Text>
         </View>
       );
     });
-    return toReturn.concat(temps);
-    // return toReturn;
+    // return toReturn.concat(temps);
+    return toReturn;
   }
 
   createTempMarkers() {
@@ -177,11 +209,11 @@ class LocationSharing extends Component {
     var markers = membersWithLocations.map(member => {
       const {id, location, authData} = member;
       const {name, color} = authData;
-      console.log("id is: " + id);
+      console.log("id is: " + name);
       return (
         <Marker.Animated
-          key={id}
-          identifier={id}
+          key={name}
+          identifier={name}
           coordinate={location}
           pinColor={color}
           title={name}
@@ -198,13 +230,13 @@ class LocationSharing extends Component {
     };
 
     // console.log(Object.size(toReturn))
-    return toReturn;
-    // return markers;
+    // return toReturn;
+    return markers;
   }
 
   fitToMarkersToMap() {
     const {members} = this.state;
-    this.map.fitToSuppliedMarkers(members.map(m => m.id), true);
+    this.map.fitToSuppliedMarkers(members.map(m => m.authData.name), true);
   }
 
   authAndName(clientId, name) {
@@ -304,7 +336,7 @@ class LocationSharing extends Component {
 
 
       self = this;
-      axios.post(self.uri + '/get_rooms_sd', {suid: self.props.suid.suid})
+      axios.post(uri + '/get_rooms_sd', {suid: self.props.suid.suid})
           .then(res =>  {
             console.log(res.data);
             res.data.forEach(function (item, index) {
@@ -315,10 +347,10 @@ class LocationSharing extends Component {
               });
               // received past message
               susbribed.on('history_message', message =>  {
-                console.log("HISTORY message for: " + message.data.suid + " lattitude at: " + message.data.latitude + " longitude at: " + message.data.longitude);
-                console.log('hist mess memb data: ' + message.member.clientData);
-                console.log('hist mess memb id: ' + message.member.id);
-                self.historyUpdateLocation(message.data, message.data.suid);
+                // console.log("HISTORY message for: " + message.data.suid + " lattitude at: " + message.data.latitude + " longitude at: " + message.data.longitude);
+                // console.log('hist mess memb data: ' + message.member.clientData);
+                // console.log('hist mess memb id: ' + message.member.id);
+                // self.historyUpdateLocation(message.data, message.data.suid);
               }
               );
               // received new message
@@ -328,12 +360,13 @@ class LocationSharing extends Component {
               // someone leaves the room u are following - check if its publisher
               room.on('member_leave', member => {
                 console.log("REMOVING SOMEONE");
-                if (member.id == item.room_id)  {
+                if (member.authData.name == item.room_id)  {
                   const members = self.state.members.slice(0);
-                  const index = members.findIndex(m => m.id === member.id);
+                  const index = members.findIndex(m => m.authData.name === member.authData.name);
                   if (index !== -1) {
+                    self.cur_members.delete(member.authData.name);
                     members.splice(index, 1);
-                    self.setState({members});
+                    self.setState({members: members});
                     console.log("REACHES DELETE");
                     self.forceUpdate();
                   }
@@ -349,10 +382,15 @@ class LocationSharing extends Component {
             console.log(error)
             }
         });    
+    this.getSubscribers();
     // iterate through all rooms, subscribe to each
     
     
     // set member list based on this iteration ...
+  }
+
+  displayModal(show){
+    this.setState({isVisible: show})
   }
 
   render() {
@@ -381,10 +419,46 @@ class LocationSharing extends Component {
             <Text>Fit Markers Onto Map</Text>
           </TouchableOpacity>
         </View>
+        <View style = { styles.buttonContainer2 }>
+         <TouchableOpacity
+              style={[styles.bubble, styles.button]}
+              onPress={() => {
+                this.displayModal(true);
+              }}>
+              <Text>Show Modal</Text>
+          </TouchableOpacity>     
+        </View>
+        <Modal
+            animationType = {"slide"}
+            transparent={true}
+            visible={this.state.isVisible}
+            propagateSwipe={true}
+            backgroundColor="transparent"
+            onBackdropPress={() => this.setState({ isVisible: false })}>
+            <View style={styles.container_modal}>
+                <FlatList data={this.state.subscribers}
+                  renderItem={({ item }) => <Item title={item} />}
+                  keyExtractor={item => item}
+                />
+            </View>
+        </Modal>
+        
       </View>
     );
   }
 }
+
+function Item({ title }) {
+  return (
+    <View  style={styles.sectionListItem}>
+      <TouchableHighlight>
+        <Text style={styles.text}>{title}</Text>
+      </TouchableHighlight>
+    </View>
+  );
+}
+
+
 
 function doAuthRequest(clientId, name, uri) {
     let status;
@@ -416,6 +490,36 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
     alignItems: 'center',
+    flex: 1,
+  },
+  container_modal: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 300,
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+    opacity: 0.7,
+    // height: Dimensions.get('window').height - 300 - ,
+  },
+  sectionListItem: {
+    backgroundColor: 'maroon',
+    padding: 20,
+    marginVertical: 6,
+    marginHorizontal: 10,
+    borderRadius: 20,
+  },
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  scrolling: {
+    flex: 1,
+    margin: 20,
+    backgroundColor: 'orange',
+    margin: 10,
+    textAlign: 'center',
+    fontSize: 20,
+    paddingTop: 70,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -434,11 +538,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 10,
   },
+  buttonText:{
+
+  },
   buttonContainer: {
     flexDirection: 'row',
     marginVertical: 20,
     backgroundColor: 'transparent',
-    marginBottom: 400,
+    marginBottom: 0,
+  },
+  buttonContainer2: {
+    flexDirection: 'row',
+    marginVertical: 20,
+    backgroundColor: 'transparent',
+    marginBottom: 10,
   },
   members: {
     flexDirection: 'column',
@@ -463,5 +576,8 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     borderRadius: 15,
+  },
+  text: {
+    fontSize: 20
   },
 });

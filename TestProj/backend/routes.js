@@ -119,6 +119,19 @@ router.post('/get_rooms_sd', (req, res) => {
 	// res.send('Returning back rooms subscribed to');
 })
 
+router.post('/get_subscribers', (req, res) => {
+	var suid = req.body.suid;
+	query = `SELECT suid FROM app_data.subscribed_to WHERE room_id='` + suid + `';`;
+	console.log(query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log(q_res);
+          res.send(q_res)
+    })
+	// res.send('Returning back rooms subscribed to');
+})
+
 
 
 
