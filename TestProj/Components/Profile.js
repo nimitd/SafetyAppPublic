@@ -59,6 +59,7 @@ export default class Profile extends Component {
       color : 'grey',
       communities : [],
       events : ['Nimit On Call 3/20', 'Full Moon On the Quad', 'Nomad', 'Xanadu Special D'],
+      refresh : true,
     }
 
     this.getData();
@@ -74,25 +75,6 @@ renderExample = (arr) => {
  	return <Component array={arr}/>;
 };
 
-  leaveCommunityAlert = () => {
-    Alert.alert(
-                'You are about to leave this community.',
-                'Are you sure you want to leave?',
-                [ { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel',},
-                  {text: 'OK', onPress: () => console.log('OK Pressed')}, ],
-                ) 
-  }
-
-  deleteEventAlert = () => {
-    Alert.alert(this.state.data);
-    Alert.alert(
-                'You are about to delete this event.',
-                'Are you sure you want to delete?',
-                [ { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel',},
-                  {text: 'OK', onPress: () => console.log('OK Pressed')}, ],
-                ) 
-  }
-
   editMyInformation = () => {
     if (this.state.editable == false) {
       this.setState({editable: true});
@@ -102,6 +84,8 @@ renderExample = (arr) => {
       this.setState({editable: false});
       this.setState({title: 'Edit My Information'});
       this.setState({color: 'grey'});
+
+      this.updateProfile(this.state.suid, this.state.first_name, this.state.last_name, this.state.phonenumber);
     }
   }
 
@@ -118,7 +102,7 @@ renderExample = (arr) => {
   getData = () => {
     //Alert.alert("here 1");
 
-    const body = {suid: 'anitaB'};
+    const body = {suid: this.state.suid};
 
     axios.post(uri + '/profile_mount', body)
       .then(res =>  {
@@ -126,7 +110,7 @@ renderExample = (arr) => {
         var communitiesArray = [];
 
         res.data.forEach(function (item, index) {
-              console.log(item.community);
+              //console.log(item.community);
               communitiesArray.push(item.community);
           });
 
@@ -143,6 +127,19 @@ renderExample = (arr) => {
       }).catch((error) => {
           console.log(error);
     });
+  }
+
+  updateProfile = (suid, firstName, lastName, phoneNumber) => {
+
+    const body = {suid: suid, first_name: firstName, last_name: lastName, phone_number: phoneNumber};
+
+    axios.post(uri + '/update_profile', body)
+      .then(res =>  {
+
+      }).catch((error) => {
+          console.log(error);
+    });
+
   }
 
   componentDidMount() {
@@ -234,6 +231,13 @@ renderExample = (arr) => {
           <Button
                 title='Create a New Community'
                 onPress = {() => this.makeCommunity()}
+              />
+
+          <View style={profile_styles.profileSeparator}></View>
+
+          <Button
+                title='Refresh'
+                onPress = {() => this.getData()}
               />
 
           <View style={profile_styles.profileSeparator}></View>

@@ -81,6 +81,27 @@ const OnboardingStack = createStackNavigator({
   }
 }, {initialRouteName: 'Landing'})
 
+const ProfileStack = createStackNavigator({
+  Profile: {
+    screen: Profile,
+    navigationOptions: {
+      headerTitle: 'Profile',
+    },
+  },
+  Join: {
+    screen: JoinCommunity,
+    navigationOptions: {
+      headerTitle: 'Join Community',
+    },
+  },
+  MakeCommunity: {
+    screen: MakeCommunity,
+    navigationOptions: {
+      headerTitle: 'Make Community',
+    },
+  },
+}, {initialRouteName: 'Profile'})
+
 const App = createBottomTabNavigator({
   Home: {
     screen: Home,
@@ -107,13 +128,13 @@ const App = createBottomTabNavigator({
     }
   },
   Profile: {
-    screen: Profile,
+    screen: ProfileStack,
     navigationOptions: {
       tabBarIcon: ({ tintColor }) => (
           <Icon name="user" size={25} color={tintColor} />
         )
     }
-  }
+  },
 });
 
 export default createAppContainer(createSwitchNavigator(

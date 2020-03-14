@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		margin: 10,
 		marginBottom: 30,
+		color: 'white',
 	},
 	instructions: {
 		fontSize: 20,

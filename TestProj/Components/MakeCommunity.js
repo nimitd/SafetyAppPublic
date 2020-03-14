@@ -9,6 +9,12 @@ import { Platform,
 import { Dropdown } from 'react-native-material-dropdown';
 import {styles} from '../styles/main_styles'
 
+import Constants from "expo-constants";
+const { manifest } = Constants;
+import axios from 'axios';
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -19,69 +25,65 @@ const instructions = Platform.select({
 export default class MakeCommunity extends Component {
 	constructor(props) {
 	    super(props);
-		this.state = {commName: '', pass: '', pass2: '', location: ''};
+		this.state = {
+			suid : 'anitaB',
+			comm_name : '',
+		};
   	}
 
 	buttonListener = () => {
+		this.makeNewCommunity(this.state.suid, this.state.comm_name);
   		this.props.navigation.navigate('Profile', {suid: this.state.suid});
+  	}
+
+  	makeNewCommunity = (suid, communityName) => {
+
+    	const body = {suid: suid, comm_name: communityName,};
+
+	    axios.post(uri + '/make_community', body)
+	      .then(res =>  {
+
+	      	// var communitiesArray = [];
+
+	       //  res.data.forEach(function (item, index) {
+	       //        communitiesArray.push(item.comm_name);
+	       //    });
+
+	       //  var dataArray = Array(communitiesArray.length)
+	       //      .fill('')
+	       //      .map((_, i) => ({ value: communitiesArray[i]}));
+
+	       //  this.setState({data : dataArray});
+
+	      }).catch((error) => {
+	          console.log(error);
+    	});
   	}
 
 	render() {
 		return (
 			<View style={styles.page}>
-				<View style={{flex:1, alignItems: 'center'}}>
-					<Text style={{fontSize: 40}}> Create a new community. </Text>
-				</ View>
-				<View style={{flex:2}}>
-					<View style={{flexDirection: 'row', justifyContent:'space-between'}}>
-						<Text style={styles.text}> Community name: </Text>
-						<TextInput
-							style={styles.textInput}
-	        				placeholder="Name your group."
-	          				onChangeText={(commName) => this.setState({commName})}
-	          				value={this.state.commName}/>
-	          		</View>
-	          		<View style={{flexDirection: 'row', justifyContent:'space-between'}}>
-						<Text style={styles.text}> Password: </Text>
-						<TextInput
-							secureTextEntry={true}
-							style={styles.textInput}
-	        				placeholder="6-12 alphanumeric characters"
-	          				onChangeText={(pass) => this.setState({pass})}
-	          				value={this.state.pass}/>
-	          		</View>
-	          		<View style={{flexDirection: 'row', justifyContent:'space-between'}}>
-						<Text style={styles.text}> Re-enter password: </Text>
-						<TextInput
-							secureTextEntry={true}
-							style={styles.textInput}
-	        				placeholder="Make sure it matches!"
-	          				onChangeText={(pass2) => this.setState({pass2})}
-	          				value={this.state.pass2}/>
-	          		</View>
-	          		<View style={{
-	          			flexDirection: 'row', 
-	          			justifyContent:'space-between'}}>
-						<Text style={styles.text}> Location (optional): </Text>
-						
-	          		</View>
-	          		<View>
-	          			<Dropdown 
-							data = {[
-								{
-									value: "None"
-								},
-								{
-									value: "Mars"
-								}
-							]}
-						/>
-					</ View>
-          		</ View>
+				<View style={{
+		          			flexDirection: 'row', 
+		          			justifyContent:'space-between',
+		          			marginBottom: 40,}}>
+					<Text style={[styles.text, {textAlign: 'center',}]}>Create a new community here. Typically, communites represent dorms, greek orgs, or other clubs.</Text>		
+		        </View>
+				<Text style={styles.text}> Give your community a name: </Text>
+				<View style={styles.inputContainer}>
+					<TextInput
+						style={styles.inputs}
+        				placeholder="Enter Your Community Name Here."
+          				onChangeText={(comm_name) => this.setState({comm_name})}
+          				value={this.state.comm_name}/>
+          		</View>
+	          	<Text style={styles.warning}>If your community name is something that might be repeated each year (i.e. Mars) we suggest you put the school year in your name (i.e. Mars 2019-2020).</Text>
+	         
           		<View style={{flex:1, flexDirection: 'column', justifyContent: 'center'}}>
 					<Button onPress = {() => this.buttonListener()}
 					title = "Create" style={{}} />
-				</ View>
+				</View>
+				<Text style={styles.warning}>When you create a community you are an admin by default. This means all members of your community will have access to your phone number.</Text>
 			</View>
 		);
 	}
