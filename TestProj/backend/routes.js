@@ -57,6 +57,25 @@ router.post('/send_prelim_user_data', (req, res, callback) => {
     })
 })
 
+
+router.post('/get_resource_data', (req, res) => {
+	// var name = req.body.name;
+	// var phonenumber = req.body.phone_num;
+	// var email = req.body.email;
+	// var description = req.body.
+	// console.log("Received User for: " + name + suid + dorm);
+	console.log("IN ROUTER FUNCTION");
+	query = 'SELECT * FROM app_data.resources;';
+	console.log("QUERY: ", query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log("after sequel error")
+          console.log(q_res)
+          res.send(q_res)
+    })
+})
+
 router.post('/updatePhoneNumber', (req, res, callback) => {
 	var phone_number = req.body.phonenumber;
 	var suid = req.body.suid;

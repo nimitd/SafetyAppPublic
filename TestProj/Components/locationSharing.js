@@ -21,6 +21,7 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const Scaledrone = require('scaledrone-react-native');
 const SCALEDRONEID = 'ck9tuUkzlzPvEaG0'
+// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
 export default class LocationSharing extends Component {
 
@@ -29,7 +30,8 @@ export default class LocationSharing extends Component {
     this.state = {
       members: []
     };
-    this.uri = props.uri
+    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
   }
 
   updateLocation(data, memberId) {
