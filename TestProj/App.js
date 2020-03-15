@@ -50,7 +50,7 @@ import { bindActionCreators } from 'redux';
 
 // const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 // ./ngrok http 3000
-const uri = 'http://7ff433b9.ngrok.io';
+const uri = 'http://039130de.ngrok.io';
 
 const OnboardingStack = createStackNavigator({
   Landing: {
