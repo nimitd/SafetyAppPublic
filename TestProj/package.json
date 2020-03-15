@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "^2.2.3",
     "@react-native-community/masked-view": "^0.1.6",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
@@ -24,6 +25,7 @@
     "react-dom": "16.9.0",
     "react-native": "0.61.4",
     "react-native-contacts": "^5.0.7",
+    "react-native-date-picker": "^2.7.8",
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "~1.5.0",
     "react-native-maps": "0.26.1",
