@@ -12,18 +12,6 @@ const colors = require('./colors');
 const CHANNEL_ID = 'ck9tuUkzlzPvEaG0'
 const CHANNEL_SECRET = 'DIlVYq9b0cudM1kHxazqU3daZXPhkxuM'
 
-router.post('/profile_mount', (req, res) => {
-	var suid = req.body.suid;
-	console.log("Received: " + suid);
-	con.query("SELECT first_name, last_name, phone_number, community FROM app_data.users as u LEFT JOIN app_data.memberships as c ON u.suid = c.suid WHERE u.suid ='" + suid + "'",
-		(q_err, q_res) => {
-          //if(q_err) return next(q_err);
-          console.log("here");
-          res.send(q_res);
-          console.log("here2");
-      })
-	//res.json('Returning back some message');
-})
 
 router.post('/test_post_harrison', (req, res) => {
 	var name = req.body.first_name;
@@ -207,6 +195,94 @@ router.post('/auth', (req, res, callback) => {
 	}, drone.CHANNEL_SECRET);
 	console.log(token)
 	res.send(token);
+})
+
+router.post('/profile_mount', (req, res) => {
+	var suid = req.body.suid;
+	console.log("Received: " + suid);
+	con.query("SELECT first_name, last_name, phone_number, community FROM app_data.users as u LEFT JOIN app_data.memberships as c ON u.suid = c.suid WHERE u.suid ='" + suid + "'",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          res.send(q_res);
+      })
+	//res.json('Returning back some message');
+})
+
+router.post('/get_communities', (req, res) => {
+	var suid = req.body.suid;
+	console.log("Received: " + suid);
+	con.query("SELECT comm_name FROM app_data.communities",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          //console.log("here");
+          //console.log(q_res);
+          res.send(q_res);
+          //console.log("here2");
+      })
+	//res.json('Returning back some message');
+})
+
+
+router.post('/join_community', (req, res) => {
+	var suid = req.body.suid;
+	var community = req.body.community;
+
+	con.query("INSERT INTO app_data.memberships (community, suid) VALUES ('" + community + "', '" + suid + "');",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          //console.log("here");
+          //console.log(q_res);
+          res.send(q_res);
+          //console.log("here2");
+      })
+	//res.json('Returning back some message');
+})
+
+router.post('/make_community', (req, res) => {
+	var suid = req.body.suid;
+	var communityName = req.body.comm_name;
+
+	console.log("here1");
+
+	console.log("Received Make Suid: " + suid);
+	console.log("Received Make Comm: " + communityName);
+
+	con.query("INSERT INTO app_data.memberships (community, suid, user_type) VALUES ('" + communityName + "', '" + suid + "', 'admin');",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          //console.log("here");
+          //console.log(q_res);
+          //res.send(q_res);
+          //console.log("here2");
+      })
+	con.query("INSERT INTO app_data.communities (comm_name) VALUE ('" + communityName +"');",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          //console.log("here");
+          //console.log(q_res);
+          res.send(q_res);
+          //console.log("here2");
+      })
+	//res.json('Returning back some message');
+})
+
+router.post('/update_profile', (req, res) => {
+	var suid = req.body.suid;
+	var firstName = req.body.first_name;
+	var lastName = req.body.last_name;
+	var phonenumber = req.body.phone_number;
+
+	console.log(firstName);
+
+	con.query("UPDATE app_data.users SET first_name= '" + firstName + "', last_name= '" + lastName + "', phone_number ='" + phonenumber + "' WHERE (suid= '" + suid + "');",
+		(q_err, q_res) => {
+          //if(q_err) return next(q_err);
+          //console.log("here");
+          //console.log(q_res);
+          res.send(q_res);
+          //console.log("here2");
+      })
+	//res.json('Returning back some message');
 })
 
 
