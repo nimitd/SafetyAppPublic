@@ -130,9 +130,19 @@ const styles = StyleSheet.create({
 	textInput: {
 		fontSize: 20
 	},
-	text: {
-		fontSize: 20
+	sectionListItem: {
+		backgroundColor: 'maroon',
+		padding: 20,
+		marginVertical: 6,
+		marginHorizontal: 10,
+		borderRadius: 20,
+
 	},
+	text: {
+		fontSize: 16,
+		color: 'white'
+
+	}
 
 });
 

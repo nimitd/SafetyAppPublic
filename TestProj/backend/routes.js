@@ -85,6 +85,82 @@ router.post('/send_prelim_user_data', (req, res, callback) => {
     })
 })
 
+
+
+router.post('/publish_event', (req, res, callback) => {
+	console.log("IN PUBLISH EVENTS!!!!")
+	const values = [[ req.body.event_title, 
+                   req.body.sober_contact_name,
+                   req.body.sober_contact_phone, 
+                   req.body.sober_contact_role,
+                   req.body.community,
+                   req.body.location,
+                   ]];
+	var sql_insert = "INSERT INTO app_data.events(event_title, sober_contact_name, sober_contact_phone, sober_contact_role, community, location) VALUES ?";
+	console.log(sql_insert)
+	con.query(sql_insert, [values], (q_err, q_res) => {
+        if(q_err){
+        	if (q_err.code == 'ER_DUP_ENTRY' || q_err.errno == 1062) {
+          		console.log("Duplicate error caught");
+          		res.status(401).send("Duplicate user error!");
+        	}
+		}
+        else	{
+	        console.log(q_res)
+	        res.send(q_res)
+      	}
+    })
+})
+
+
+
+
+
+
+
+
+router.post('/get_resource_data', (req, res) => {
+	// var name = req.body.name;
+	// var phonenumber = req.body.phone_num;
+	// var email = req.body.email;
+	// var description = req.body.
+	// console.log("Received User for: " + name + suid + dorm);
+	console.log("IN ROUTER FUNCTION");
+	query = 'SELECT * FROM app_data.resources;';
+	console.log("QUERY: ", query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log("after sequel error")
+          console.log(q_res)
+          res.send(q_res)
+    })
+})
+
+
+
+
+router.post('/get_event_data', (req, res) => {
+	// var name = req.body.name;
+	// var phonenumber = req.body.phone_num;
+	// var email = req.body.email;
+	// var description = req.body.
+	// console.log("Received User for: " + name + suid + dorm);
+	console.log("IN ROUTER FUNCTION");
+	query = 'SELECT * FROM app_data.events;';
+	console.log("QUERY: ", query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log("after sequel error")
+          console.log(q_res)
+          res.send(q_res)
+    })
+})
+
+
+
+
 router.post('/updatePhoneNumber', (req, res, callback) => {
 	var phone_number = req.body.phonenumber;
 	var suid = req.body.suid;
