@@ -6,10 +6,20 @@ import { Platform,
 	Button,
 	Picker,
     KeyboardAvoidingView, 
+    ScrollView,
 
 	Alert } from 'react-native';
+
+import Constants from "expo-constants";
+const { manifest } = Constants;
+import axios from 'axios';
+
 import { Dropdown } from 'react-native-material-dropdown';
 import {styles} from '../styles/main_styles'
+
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 
 const instructions = Platform.select({
@@ -18,54 +28,121 @@ const instructions = Platform.select({
 });
 
 
-export default class JoinCommunity extends Component {
+
+class JoinCommunity extends Component {
 	constructor(props) {
 	    super(props);
-		this.state = {commName: '', pass: '', pass2: '', location: ''};
+		this.state = {
+			suid : 'anitaB',
+			community : '',
+			data : [],
+		}
+
+		this.getCommunities();
+  	}
+
+  	buttonListener = () => {
+  		this.sendCommunity(this.state.suid, this.state.community);
+  		this.props.navigation.navigate('Profile', {suid: this.state.suid});
+  	}
+
+  	self = this;
+
+  	getCommunities = () => {
+
+	    axios.post(self.props.suid.uri + '/get_communities')
+	      .then(res =>  {
+
+	      	var communitiesArray = [];
+
+	        res.data.forEach(function (item, index) {
+	              communitiesArray.push(item.comm_name);
+	          });
+
+	        var dataArray = Array(communitiesArray.length)
+	            .fill('')
+	            .map((_, i) => ({ value: communitiesArray[i]}));
+
+	        this.setState({data : dataArray});
+
+	      }).catch((error) => {
+	          console.log(error);
+    	});
+  	}
+
+  	self = this;
+
+  	sendCommunity = (suid, community) => {
+
+    	const body = {suid: suid, community: community,};
+
+	    axios.post(self.props.suid.uri + '/join_community', body)
+	      .then(res =>  {
+
+	      	// var communitiesArray = [];
+
+	       //  res.data.forEach(function (item, index) {
+	       //        communitiesArray.push(item.comm_name);
+	       //    });
+
+	       //  var dataArray = Array(communitiesArray.length)
+	       //      .fill('')
+	       //      .map((_, i) => ({ value: communitiesArray[i]}));
+
+	       //  this.setState({data : dataArray});
+
+	      }).catch((error) => {
+	          console.log(error);
+    	});
   	}
 
 	render() {
 		return (
 			<View style={styles.page}>
-				<View style={{flex:1, alignItems: 'center'}}>
-					<Text style={{fontSize: 40}}> Join a community. </Text>
-				</ View>
-				<View style={{flex:2}}>
-					<View style={{
-	          			flexDirection: 'row', 
-	          			justifyContent:'space-between'}}>
-						<Text style={styles.text}> Community Name: </Text>
-						
-	          		</View>
-	          		<View>
-	          			<Dropdown 
-							data = {[
-								{
-									value: "community_1"
-								},
-								{
-									value: "community_2"
-								}
-							]}
-						/>
-					</ View>
-				</View>
-	          		<KeyboardAvoidingView style={{flexDirection: 'row', justifyContent:'space-between'}} behavior="padding" enabled>
-						<Text style={styles.text}> Password: </Text>
-						<TextInput
-							secureTextEntry={true}
-							style={styles.textInput}
-	        				placeholder="6-12 alphanumeric characters"
-	          				onChangeText={(pass) => this.setState({pass})}
-	          				value={this.state.pass}/>
-	          		</KeyboardAvoidingView>
+				<ScrollView style={styles.scrollView}>
+
+					<View style={{flex:2}}>
+						<View style={{
+		          			flexDirection: 'row', 
+		          			justifyContent:'space-between',
+		          			marginBottom: 40,}}>
+							<Text style={[styles.text, {textAlign: 'center',}]}>Select the name of the community you'd like to join from the list below. Don't worry, you can always join additonal communities.</Text>		
+		          		</View>
+						<View style={{
+		          			flexDirection: 'row', 
+		          			justifyContent:'space-between'}}>
+							<Text style={styles.text}>Available Communities: </Text>		
+		          		</View>
+		          		<View style ={{marginBottom: 40,}}>
+		          			<Dropdown 
+		          				data = {this.state.data}
+		          				onChangeText={(text) => this.setState({community : text})}
+							/>
+						</View>
+					</View>
+
 	          		<View style={{flex:1, flexDirection: 'column', justifyContent: 'center'}}>
-						<Button onPress = {() => Alert.alert(
-	         										'Thanks for joining a community! You are all set for the demo.'
-	      										)}
+						<Button onPress = {() => this.buttonListener()}
 						title = "Join" style={{}} />
 					</ View>
+					<View style={{
+		          			flexDirection: 'row', 
+		          			justifyContent:'space-between',
+		          			marginTop: 40,}}>
+							<Text style={[styles.text, {textAlign: 'center',}]}>Don't see what you're looking for? Head back to create a new community.</Text>		
+		          		</View>
+				</ScrollView>
 			</View>
 		);
 	}
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(JoinCommunity);

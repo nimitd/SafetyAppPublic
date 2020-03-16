@@ -28,7 +28,6 @@ import Resources from './Components/Resources'
 import Profile from './Components/Profile'
 
 
-
 // backend connect code
 import Constants from "expo-constants";
 const { manifest } = Constants;
@@ -42,7 +41,15 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// Redux App
+import { connect } from 'react-redux';
+import { changeSUID } from './actions/suids';
+import { bindActionCreators } from 'redux';
+
+
+// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// ./ngrok http 3000
+const uri = 'http://039130de.ngrok.io';
 
 const OnboardingStack = createStackNavigator({
   Landing: {
@@ -82,7 +89,29 @@ const OnboardingStack = createStackNavigator({
   }
 }, {initialRouteName: 'Landing'})
 
-const App = createBottomTabNavigator({
+
+const ProfileStack = createStackNavigator({
+  Profile: {
+    screen: Profile,
+    navigationOptions: {
+      headerTitle: 'Profile',
+    },
+  },
+  Join: {
+    screen: JoinCommunity,
+    navigationOptions: {
+      headerTitle: 'Join Community',
+    },
+  },
+  MakeCommunity: {
+    screen: MakeCommunity,
+    navigationOptions: {
+      headerTitle: 'Make Community',
+    },
+  },
+}, {initialRouteName: 'Profile'})
+
+const MainApp = createBottomTabNavigator({
   Home: {
     screen: Home,
     navigationOptions: {
@@ -108,25 +137,60 @@ const App = createBottomTabNavigator({
     }
   },
   Profile: {
-    screen: Profile,
+    screen: ProfileStack,
     navigationOptions: {
       tabBarIcon: ({ tintColor }) => (
           <Icon name="user" size={25} color={tintColor} />
         )
     }
-  }
+  },
 });
 
-export default createAppContainer(createSwitchNavigator(
+
+// const mapStateToProps = state => ({
+//   suid: state.suid,
+// });
+
+// const ActionCreators = Object.assign(
+//   {},
+//   changeSUID,
+// );
+
+// const mapDispatchToProps = dispatch => ({
+//   actions: bindActionCreators(ActionCreators, dispatch),
+// });
+
+
+const Switch = createAppContainer(createSwitchNavigator(
   {
-    AuthLoading: Loading,
-    Home : App,
-    Onboarding : OnboardingStack,
+    AuthLoading: {screen: Loading},
+    Home : {screen: MainApp},
+    Onboarding : {screen: OnboardingStack},
   },
   {
     initialRouteName: 'AuthLoading',
   }
 ));
+
+import { Provider } from 'react-redux';
+import configureStore from './store/configureStore';
+
+const store = configureStore()
+
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <View style={styles.container}>
+          <Switch />
+        </View>
+      </Provider>
+    );
+  }
+}
+
+
+// export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 const styles = StyleSheet.create({
 

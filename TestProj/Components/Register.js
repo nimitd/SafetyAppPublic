@@ -21,16 +21,18 @@ import axios from 'axios';
 
 import {styles} from '../styles/main_styles'
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 
-export default class Register extends Component {
+
+class Register extends Component {
 
   constructor(props) {
     super(props);
 
     // this.register=props.onRegister;
-    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
     state = {
       first_name   : '',
@@ -46,7 +48,7 @@ export default class Register extends Component {
     const body = {first_name: this.state.first_name, last_name: this.state.last_name,
         suid: this.state.suid, dorm: this.state.dorm};
     console.log(body);
-    axios.post(this.uri + '/send_prelim_user_data', body)
+    axios.post(this.props.suid.uri + '/send_prelim_user_data', body)
         .then(res =>  {
           this.props.navigation.navigate('Phone', {suid: this.state.suid});
         })
@@ -127,3 +129,14 @@ render() {
     );
   }
 }
+
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

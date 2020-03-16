@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		margin: 10,
 		marginBottom: 30,
+		color: 'white',
 	},
 	instructions: {
 		fontSize: 20,
@@ -129,9 +130,19 @@ const styles = StyleSheet.create({
 	textInput: {
 		fontSize: 20
 	},
-	text: {
-		fontSize: 20
+	sectionListItem: {
+		backgroundColor: 'maroon',
+		padding: 20,
+		marginVertical: 6,
+		marginHorizontal: 10,
+		borderRadius: 20,
+
 	},
+	text: {
+		fontSize: 16,
+		color: 'white'
+
+	}
 
 });
 
