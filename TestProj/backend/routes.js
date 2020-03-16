@@ -58,7 +58,7 @@ router.post('/send_prelim_user_data', (req, res, callback) => {
                    req.body.suid, 
                    req.body.dorm]];
 	var sql_insert = "INSERT INTO app_data.users(first_name, last_name, suid, residence) VALUES ?";
-	console.log(sql_insert)
+	console.log(sql_insert);
 	con.query(sql_insert, [values], (q_err, q_res) => {
         if(q_err){
         	if (q_err.code == 'ER_DUP_ENTRY' || q_err.errno == 1062) {
@@ -166,7 +166,6 @@ router.post('/updatePhoneNumber', (req, res, callback) => {
 })
 
 router.post('/auth', (req, res, callback) => {
-	console.log("GOT AUTH REQ")
 	const {clientId, name} = req.body;
 	if (!clientId || clientId.length < 1) {
 		console.log("ERROR 1")
@@ -181,7 +180,7 @@ router.post('/auth', (req, res, callback) => {
 		client: clientId,
 		channel: drone.CHANNEL_ID,
 		permissions: {
-			"^observable-locations$": {
+			"^observable-.*$": {
 				publish: true,
 				subscribe: true,
 				history: 50,
@@ -193,7 +192,6 @@ router.post('/auth', (req, res, callback) => {
 		},
 		exp: Math.floor(Date.now() / 1000) + 60 * 3 // expire in 3 minutes
 	}, drone.CHANNEL_SECRET);
-	console.log(token)
 	res.send(token);
 })
 
@@ -283,6 +281,69 @@ router.post('/update_profile', (req, res) => {
           //console.log("here2");
       })
 	//res.json('Returning back some message');
+})
+
+
+router.post('/get_rooms_sd', (req, res) => {
+	var suid = req.body.suid;
+	query = `SELECT room_id FROM app_data.subscribed_to WHERE suid='` + suid + `';`;
+	console.log(query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log(q_res);
+          res.send(q_res)
+    })
+	// res.send('Returning back rooms subscribed to');
+})
+
+router.post('/get_subscribers', (req, res) => {
+	var suid = req.body.suid;
+	query = `SELECT suid FROM app_data.subscribed_to WHERE room_id='` + suid + `';`;
+	console.log(query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log(q_res);
+          res.send(q_res)
+    })
+	// res.send('Returning back rooms subscribed to');
+})
+
+router.post('/stop_sharing', (req, res) => {
+	const {suid, subscriber} = req.body;
+	// query = `SELECT suid FROM app_data.subscribed_to WHERE room_id='` + suid + `';`;
+	query = `DELETE FROM app_data.subscribed_to WHERE suid = '` + subscriber + `' AND room_id = '` + suid + `';`;
+	console.log(query);
+	con.query(query,
+          (q_err, q_res) => {
+          if(q_err) return res.send(q_err);
+          console.log(q_res);
+          res.send(q_res)
+    })
+	// res.send('Returning back rooms subscribed to');
+})
+
+router.post('/start_sharing', (req, res) => {
+	const {suid, subscriber} = req.body;
+    const values = [[ subscriber, 
+                   suid]];
+	var sql_insert = "INSERT INTO app_data.subscribed_to(suid, room_id) VALUES ?";
+	console.log(sql_insert);
+	con.query(sql_insert, [values], (q_err, q_res) => {
+		console.log()
+        if(q_err){
+        	if (q_err.code == 'ER_DUP_ENTRY' || q_err.errno == 1062) {
+          		console.log("Duplicate error caught");
+          		res.status(401).send("Duplicate user error!");
+        	}
+		}
+        else	{
+	        console.log(q_res)
+	        res.send(q_res)
+      	}
+    })
+	// res.send('Returning back rooms subscribed to');
 })
 
 
