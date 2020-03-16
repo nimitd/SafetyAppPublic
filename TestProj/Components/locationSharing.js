@@ -30,6 +30,7 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const Scaledrone = require('scaledrone-react-native');
 const SCALEDRONEID = 'ck9tuUkzlzPvEaG0'
+// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
 // Redux Imports
 import { connect } from 'react-redux';
