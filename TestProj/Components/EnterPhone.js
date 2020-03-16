@@ -14,12 +14,15 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
-export default class EnterPhone extends Component {
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
+
+class EnterPhone extends Component {
 
   constructor(props) {
     super(props);
     // this.login = props.onLogin;
-    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
     this.suid = props.suid;
     this.state = {hasSubmitted: false, phonenumber: '',}
     }
@@ -28,7 +31,7 @@ export default class EnterPhone extends Component {
     // Send Name and SUID to server for account creation
     const body = {phonenumber: this.state.phonenumber, suid: this.suid};
     console.log(body);
-    axios.post(this.uri + '/updatePhoneNumber', body)
+    axios.post(this.props.suid.uri + '/updatePhoneNumber', body)
         .then(res =>  {
           this.props.navigation.navigate('Code');
         })
@@ -66,3 +69,13 @@ export default class EnterPhone extends Component {
     );
   }
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(EnterPhone);

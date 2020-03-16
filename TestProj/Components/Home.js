@@ -34,14 +34,14 @@ import {styles} from '../styles/main_styles'
 import {home_styles} from '../styles/home_styles'
 import Modal from 'react-native-modal';
 
-
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 const EVENTS = {};
 
 
-export default class Home extends Component {
+class Home extends Component {
 
 
 	constructor() {
@@ -92,7 +92,7 @@ export default class Home extends Component {
     	sober_contact_phone: this.state.sober_phone, sober_contact_role: this.state.sober_role,
     	community: this.state.community, location: this.state.location};
     console.log(body);
-    axios.post(uri + '/publish_event', body)
+    axios.post(self.props.suid.uri + '/publish_event', body)
         .then(res =>  {
         	// Alert.alert("Successfully published event! Please refresh your app to view newest changes.")
         	Alert.alert(
@@ -132,7 +132,7 @@ export default class Home extends Component {
 		populate_events = () => {
 		console.log("IN POPULATE EVENTS");
 			self = this;
-			axios.post(uri + '/get_event_data', {})
+			axios.post(self.props.suid.uri + '/get_event_data', {})
 					.then(res =>  {
 						console.log(res.data);
 						res.data.forEach(function (item, index) {
@@ -479,36 +479,33 @@ closeModal = () => {
   	this.setState({isModalVisible: false});
   }
 
-
-
 	render() {
-		if (1==1) {
-			return (
-				<View style = {[styles.container, {justifyContent: 'space-around'}]}>
-				<Text style = {[styles_here.section_header, {textAlign: 'center', fontSize: 30}]}> HEY, YOU :) </Text>
+		return (
+			<View style = {[styles.container, {justifyContent: 'space-around'}]}>
+			<Text style = {[styles_here.section_header, {textAlign: 'center', fontSize: 30}]}> HEY, YOU :) </Text>
 
-				<Text style = {[styles_here.section_header, {}]}> Who's Sober? </Text>
-				{this.display_sober_ppl()}
-				<Text style = {styles.loginText}> How Can I Get Home? </Text>
-				{this.display_navigation_options()}
-				<Text style = {styles.loginText}> Emergency Calls </Text>
-				{this.display_emergency_buttons()}
-				</ View>
-
-			);
-	} else {
-		 return (
-		   <View style={styles_here.date_time_container}>
-		     <DatePickerIOS
-		       date={this.state.chosenDate}
-		       onDateChange={this.setDate}
-		     />
-		   </View>
-		 );
-
-		}
+			<Text style = {[styles_here.section_header, {}]}> Who's Sober? </Text>
+			{this.display_sober_ppl()}
+			<Text style = {styles.loginText}> How Can I Get Home? </Text>
+			{this.display_navigation_options()}
+			<Text style = {styles.loginText}> Emergency Calls </Text>
+			{this.display_emergency_buttons()}
+			</ View>
+		);
 	}
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
+
+
 
 
 

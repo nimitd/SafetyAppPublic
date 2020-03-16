@@ -28,12 +28,13 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-
-
 import {styles} from '../styles/main_styles';
 import {home_styles} from '../styles/home_styles';
 import {profile_styles} from '../styles/profile_styles';
+
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 function Item({ title }) {
     console.log(title);
@@ -44,16 +45,16 @@ function Item({ title }) {
     );
   }
 
-export default class Profile extends Component {
+class Profile extends Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      suid: 'anitaB',
-      first_name  : 'Harrison',
-      last_name  : 'Bronfeld',
-      phonenumber : '609-613-2175',
+      suid: props.suid.suid,
+      first_name  : '',
+      last_name  : '',
+      phonenumber : '',
       editable : false,
       title : 'Edit My Information',
       color : 'grey',
@@ -104,7 +105,7 @@ renderExample = (arr) => {
 
     const body = {suid: this.state.suid};
 
-    axios.post(uri + '/profile_mount', body)
+    axios.post(self.props.suid.uri + '/profile_mount', body)
       .then(res =>  {
 
         var communitiesArray = [];
@@ -133,7 +134,7 @@ renderExample = (arr) => {
 
     const body = {suid: suid, first_name: firstName, last_name: lastName, phone_number: phoneNumber};
 
-    axios.post(uri + '/update_profile', body)
+    axios.post(this.props.suid.uri + '/update_profile', body)
       .then(res =>  {
 
       }).catch((error) => {
@@ -257,6 +258,16 @@ renderExample = (arr) => {
     );
   }
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 const styles1 = StyleSheet.create({
     container: {

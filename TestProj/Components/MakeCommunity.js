@@ -13,8 +13,9 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -22,7 +23,7 @@ const instructions = Platform.select({
 });
 
 
-export default class MakeCommunity extends Component {
+class MakeCommunity extends Component {
 	constructor(props) {
 	    super(props);
 		this.state = {
@@ -40,7 +41,7 @@ export default class MakeCommunity extends Component {
 
     	const body = {suid: suid, comm_name: communityName,};
 
-	    axios.post(uri + '/make_community', body)
+	    axios.post(this.props.suid.uri + '/make_community', body)
 	      .then(res =>  {
 
 	      	// var communitiesArray = [];
@@ -88,3 +89,13 @@ export default class MakeCommunity extends Component {
 		);
 	}
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MakeCommunity);

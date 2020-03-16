@@ -22,15 +22,12 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
-// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-uri = `http://039130de.ngrok.io`;
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const Scaledrone = require('scaledrone-react-native');
 const SCALEDRONEID = 'ck9tuUkzlzPvEaG0'
-// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
 // Redux Imports
 import { connect } from 'react-redux';
@@ -46,7 +43,6 @@ class LocationSharing extends Component {
       isVisible: false,
       subscribers: []
     };
-    // this.uri = `http://bc13f145.ngrok.io`;
     this.cur_members = new Set();
     this.notActiveMembers = new Set();
     this.notActiveMemberNames = new Set();
@@ -56,7 +52,7 @@ class LocationSharing extends Component {
 
   getSubscribers() {
     self = this;
-    axios.post(uri + '/get_subscribers', {suid: self.props.suid.suid})
+    axios.post(self.props.suid.uri + '/get_subscribers', {suid: self.props.suid.suid})
           .then(res =>  {
             console.log(res.data);
             subs = self.state.subscribers;
@@ -159,13 +155,10 @@ class LocationSharing extends Component {
     this.map.fitToSuppliedMarkers(members.map(m => m.id), true);
   }
 
-  authAndName(clientId, name) {
-    return doAuthRequest(clientId, name, uri);
-  }
 
   showSubscribedLocations() {
     self = this;
-    axios.post(uri + '/get_rooms_sd', {suid: self.props.suid.suid})
+    axios.post(self.props.suid.uri + '/get_rooms_sd', {suid: self.props.suid.suid})
         .then(res =>  {
           console.log("Query getting back size: " + self.props.suid.suid + res.data.length);
           res.data.forEach(function (item, index) {
@@ -198,7 +191,6 @@ class LocationSharing extends Component {
   }
 
   componentDidMount() {
-    console.log("URI: " + uri);
     Permissions.askAsync(Permissions.LOCATION);
     const drone = new Scaledrone(SCALEDRONEID);
     drone.on('error', error => console.error(error));
@@ -207,7 +199,7 @@ class LocationSharing extends Component {
       if (error) {
         return console.error(error);
       }
-        doAuthRequest(drone.clientId, this.props.suid.suid, uri).then(
+        doAuthRequest(drone.clientId, this.props.suid.suid, this.props.suid.uri).then(
           jwt => {drone.authenticate(jwt)}
       );
     });
@@ -284,7 +276,7 @@ class LocationSharing extends Component {
         {text: 'No', onPress: () => console.warn('NO Pressed'), style: 'cancel'},
         {text: 'Yes', onPress: () => 
           
-          axios.post(uri + '/stop_sharing', {suid: suid, subscriber: item})
+          axios.post(self.props.suid.uri + '/stop_sharing', {suid: suid, subscriber: item})
                 .then(res =>  {
                   console.log(res.data);
                   subs = self.state.subscribers;
@@ -312,7 +304,7 @@ class LocationSharing extends Component {
     suid = this.props.suid.suid;
     self = this;
     Alert.prompt('Who would you like to share your location with (SUID)?', null, name => {
-        axios.post(uri + '/start_sharing', {suid: suid, subscriber: name})
+        axios.post(self.props.suid.uri + '/start_sharing', {suid: suid, subscriber: name})
                 .then(res =>  {
                   subs = self.state.subscribers;
                   subs.push(name);

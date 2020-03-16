@@ -14,10 +14,12 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 import axios from 'axios';
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-
 import { Dropdown } from 'react-native-material-dropdown';
 import {styles} from '../styles/main_styles'
+
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 
 const instructions = Platform.select({
@@ -27,7 +29,7 @@ const instructions = Platform.select({
 
 
 
-export default class JoinCommunity extends Component {
+class JoinCommunity extends Component {
 	constructor(props) {
 	    super(props);
 		this.state = {
@@ -48,7 +50,7 @@ export default class JoinCommunity extends Component {
 
   	getCommunities = () => {
 
-	    axios.post(uri + '/get_communities')
+	    axios.post(self.props.suid.uri + '/get_communities')
 	      .then(res =>  {
 
 	      	var communitiesArray = [];
@@ -74,7 +76,7 @@ export default class JoinCommunity extends Component {
 
     	const body = {suid: suid, community: community,};
 
-	    axios.post(uri + '/join_community', body)
+	    axios.post(self.props.suid.uri + '/join_community', body)
 	      .then(res =>  {
 
 	      	// var communitiesArray = [];
@@ -134,3 +136,13 @@ export default class JoinCommunity extends Component {
 		);
 	}
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(JoinCommunity);

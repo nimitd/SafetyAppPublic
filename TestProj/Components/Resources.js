@@ -30,10 +30,10 @@ import call from 'react-native-phone-call';
 import { Icon } from 'react-native-elements'
 import update from 'immutability-helper';
 import Modal from 'react-native-modal';
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
-
-
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
 
 
 
@@ -96,11 +96,10 @@ function Item({ title }) {
     );
 }
 
+class Resources extends Component {
 
-export default class Resources extends Component {
-
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       search: false,
       dataToShow: DATA,
@@ -115,7 +114,7 @@ export default class Resources extends Component {
   populate_data = () => {
     console.log("IN POPULATE DATA");
       self = this;
-      axios.post(uri + '/get_resource_data', {})
+      axios.post(self.props.suid.uri + '/get_resource_data', {})
           .then(res =>  {
             console.log(res.data);
             res.data.forEach(function (item, index) {
@@ -306,6 +305,16 @@ display_contacts() {
 
   }
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Resources);
 
 const styles_here = StyleSheet.create({
   header: {

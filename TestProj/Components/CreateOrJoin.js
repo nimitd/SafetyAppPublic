@@ -12,19 +12,22 @@ const { manifest } = Constants;
 
 import {styles} from '../styles/main_styles'
 
+// Redux Imports
+import { connect } from 'react-redux';
+import { changeSUID } from '../actions/suids';
+
 
 function Separator() { 
 	return <View style = {styles.separator} />;
 
 }
 
-export default class CreateOrJoin extends Component {
+class CreateOrJoin extends Component {
 
 constructor(props) {
     super(props);
 
     // this.clicked_button=props.onCommunityClick;
-    this.uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
   }
 
@@ -57,3 +60,13 @@ constructor(props) {
     );
   }
 }
+
+const mapStateToProps = ({suid}) => ({
+   suid
+});
+
+const mapDispatchToProps = {
+  changeSUID
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateOrJoin);

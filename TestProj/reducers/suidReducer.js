@@ -1,7 +1,8 @@
 import { SUID_CHANGE } from '../constants';
 
 const initialState = {
-	suid: ''
+	suid: '',
+	uri: 'http://1246aaca.ngrok.io'
 };
 const suidReducer = (state = initialState, action) => {
 	switch(action.type) {
