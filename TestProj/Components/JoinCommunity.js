@@ -21,36 +21,28 @@ import {styles} from '../styles/main_styles'
 import { connect } from 'react-redux';
 import { changeSUID } from '../actions/suids';
 
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
-});
-
-
-
 class JoinCommunity extends Component {
 	constructor(props) {
 	    super(props);
 		this.state = {
-			suid : 'anitaB',
+			suid : props.suid.suid,
+			uri : props.suid.uri,
 			community : '',
 			data : [],
-		}
-
+		};
 		this.getCommunities();
   	}
 
   	buttonListener = () => {
   		this.sendCommunity(this.state.suid, this.state.community);
-  		this.props.navigation.navigate('Profile', {suid: this.state.suid});
+  		this.props.navigation.navigate('Profile');
   	}
 
   	self = this;
 
   	getCommunities = () => {
 
-	    axios.post(self.props.suid.uri + '/get_communities')
+	    axios.post(this.state.uri + '/get_communities')
 	      .then(res =>  {
 
 	      	var communitiesArray = [];
@@ -76,7 +68,7 @@ class JoinCommunity extends Component {
 
     	const body = {suid: suid, community: community,};
 
-	    axios.post(self.props.suid.uri + '/join_community', body)
+	    axios.post(this.state.uri + '/join_community', body)
 	      .then(res =>  {
 
 	      	// var communitiesArray = [];
@@ -98,30 +90,29 @@ class JoinCommunity extends Component {
 
 	render() {
 		return (
-			<View style={styles.page}>
-				<ScrollView style={styles.scrollView}>
-
-					<View style={{flex:2}}>
+			<View style={[styles.page, {justifyContent: 'center',}]}>
+					<View>
 						<View style={{
 		          			flexDirection: 'row', 
 		          			justifyContent:'space-between',
 		          			marginBottom: 40,}}>
-							<Text style={[styles.text, {textAlign: 'center',}]}>Select the name of the community you'd like to join from the list below. Don't worry, you can always join additonal communities.</Text>		
+							<Text style={{textAlign: 'center', fontSize: 20, color: 'white'}}>Select the name of the community you'd like to join from the list below. Don't worry, you can always join additonal communities.</Text>		
 		          		</View>
 						<View style={{
 		          			flexDirection: 'row', 
 		          			justifyContent:'space-between'}}>
 							<Text style={styles.text}>Available Communities: </Text>		
 		          		</View>
-		          		<View style ={{marginBottom: 40,}}>
+		          		<View style ={{paddingHorizontal: 20, marginBottom: 40, marginTop: 20, backgroundColor: 'white', borderRadius:10,}}>
 		          			<Dropdown 
 		          				data = {this.state.data}
 		          				onChangeText={(text) => this.setState({community : text})}
+		          				value = "    Pick an available community!"
 							/>
 						</View>
 					</View>
 
-	          		<View style={{flex:1, flexDirection: 'column', justifyContent: 'center'}}>
+	          		<View style={{ flexDirection: 'column', justifyContent: 'center'}}>
 						<Button onPress = {() => this.buttonListener()}
 						title = "Join" style={{}} />
 					</ View>
@@ -131,7 +122,6 @@ class JoinCommunity extends Component {
 		          			marginTop: 40,}}>
 							<Text style={[styles.text, {textAlign: 'center',}]}>Don't see what you're looking for? Head back to create a new community.</Text>		
 		          		</View>
-				</ScrollView>
 			</View>
 		);
 	}

@@ -31,7 +31,6 @@ const { manifest } = Constants;
 import axios from 'axios';
 
 import {styles} from '../styles/main_styles'
-import {home_styles} from '../styles/home_styles'
 import Modal from 'react-native-modal';
 
 // Redux Imports
@@ -328,9 +327,9 @@ publish_event_modal() {
     		</View>
 
     		<View style = {styles.buttonSpaceContainer}>
-    		  <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
+    		  <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
             <Text style={styles.loginText}>Publish My Event</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </View>
      </ScrollView>
 );
@@ -341,41 +340,42 @@ display_sober_ppl() {
 	var self = this;
 	var namesList = range.map(function(index) {
                         return (
-                        	<View style = {styles_here.sectionListItem}>
-                        		{EVENTS[index]!=undefined ?
-                        			<View>
-                        				<Text style = {styles_here.event_text}> <Text style = {{fontWeight: 'bold', fontSize: 15}}> {EVENTS[index]['sober_contact_name']} {'\n'} </Text>
-                        				</Text>
-												<View style = {{flexDirection: 'row', paddingBottom: 10}}>
-									              <Icon name = "location-on" size = {20}/> 
-														<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['location']} </Text>									            
+							<TouchableOpacity onPress={() => self.makeCall(EVENTS[index]['sober_contact_phone'])}>
+	                        	<View style = {styles_here.sectionListItemSober}>
+	                        		{EVENTS[index]!=undefined ?
+	                        			<View>
+	                        				<Text style = {styles_here.event_text}> <Text style = {{fontWeight: 'bold', fontSize: 15}}> {EVENTS[index]['sober_contact_name']} {'\n'} </Text>
+	                        				</Text>
+													<View style = {{flexDirection: 'row', paddingBottom: 10}}>
+										              <Icon name = "location-on" size = {20}/> 
+															<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['location']} </Text>									            
+														</View>
+													<View style = {{flexDirection: 'row', paddingBottom: 10}}>
+										              <Icon name = "person" size = {20}/> 
+															<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_role']} </Text>									            
 													</View>
-												<View style = {{flexDirection: 'row', paddingBottom: 10}}>
-									              <Icon name = "person" size = {20}/> 
-														<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_role']} </Text>									            
-												</View>
-												<TouchableHighlight onPress={() => self.makeCall(EVENTS[index]['sober_contact_phone'])}>
-									            <View style = {{flexDirection: 'row'}}>
-									              <Icon name = "phone" size = {20}/> 
-														<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_phone']} </Text>									            
-													</View>
-									          </TouchableHighlight>
+													
+										            <View style = {{flexDirection: 'row'}}>
+										              <Icon name = "phone" size = {20}/> 
+															<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_phone']} </Text>									            
+														</View>
 
-					 						</View>
-					 						: <Text style = {styles.loginText}> Loading... </Text>}
-			 						</View>
+						 						</View>
+						 						: <Text style = {styles.loginText}> Loading... </Text>}
+				 				</View>
+			 				</TouchableOpacity>
                       )});
 
 	namesList.push(
-		<View style = {[styles_here.sectionListItem, {backgroundColor: 'dimgrey'}]}>
-     		<TouchableHighlight onPress={() => this.openModal()}>
+		<View style = {[styles_here.sectionListItemSober, {backgroundColor: 'dimgrey'}]}>
+     		<TouchableOpacity onPress={() => this.openModal()}>
      			<View>
         			<Icon name = "add" size = {130}/> 
       			<Modal isVisible={this.state.isModalVisible} style={styles_here.modal} onBackdropPress={()=>this.closeModal()}>
       				{this.publish_event_modal()}
       			</Modal>
       		</View>
-      	</TouchableHighlight>
+      	</TouchableOpacity>
 		</View>
 		);
 
@@ -389,20 +389,20 @@ display_navigation_options() {
 	return ( 					
 		<ScrollView horizontal = {true}>
 			 <TouchableOpacity onPress={() => this.makeCall('6507257873')}>
-				<View style={[styles_here.sectionListItem, styles_here.navigation]}>
+				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
 					<Text style={[styles_here.navigation_text]}> 5-SURE </Text> 
 				</View>
 			</TouchableOpacity>
 
 			<TouchableOpacity onPress={() => Linking.openURL('maps://app?saddr=Cupertino&San+Francisco')}>
-				<View style={[styles_here.sectionListItem, styles_here.navigation]}>
+				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
 					<Text style={[styles.loginText, styles_here.navigation_text, {textAlign: 'center'}]}>Walking Directions via Maps </Text> 
 				</View>
 			</TouchableOpacity>
 
 
 			<TouchableOpacity onPress={() => Linking.openURL('https://campus-map.stanford.edu/')}>
-				<View style={[styles_here.sectionListItem, styles_here.navigation]}>
+				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
 					<Text style={[styles.loginText, styles_here.navigation_text, {textAlign: 'center'}]}>Stanford Campus Searchable Map </Text> 
 				</View>
 			</TouchableOpacity>
@@ -410,18 +410,16 @@ display_navigation_options() {
 
 
 			<TouchableOpacity onPress={() => Linking.openURL('lyft://app')}>
-				<View style={[styles_here.sectionListItem, styles_here.navigation]}>
+				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
 					<Text style={[styles.loginText, styles_here.navigation_text]}> Lyft </Text> 
 				</View>
 			</TouchableOpacity>
 
-
 			<TouchableOpacity onPress={() => Linking.openURL('uber://app')}>
-				<View style={[styles_here.sectionListItem, styles_here.navigation]}>
+				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
 					<Text style={[styles.loginText, styles_here.navigation_text]}> Uber </Text> 
 				</View>
 			</TouchableOpacity>
-
 
 		</ScrollView>);
 		}
@@ -433,36 +431,32 @@ display_navigation_options() {
 		return (
 			<View style = {[{flexDirection: 'row'}]}>
 				<ScrollView horizontal = {true}>
-					<View style = {styles_here.emergency_button}> 
-						<TouchableHighlight onPress={() => self.makeCall('8023933907')}>
-			            <View style = {[]}>
-								<Text style = {[styles_here.event_text, {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10, paddingBottom: 10}]}> EMERGENCY CONTACT</Text>									            
+					<TouchableOpacity onPress={() => self.makeCall('8023933907')}>
+						<View style = {styles_here.emergency_button}> 
+				            <View style = {[]}>
+									<Text style = {[styles_here.event_text, {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10, paddingBottom: 10}]}> EMERGENCY CONTACT</Text>									            
+				              <Icon name = "phone" size = {35}/> 
+								</View>
+						</View>
+					</TouchableOpacity>
 
-			              <Icon name = "phone" size = {35}/> 
-							</View>
-			          </TouchableHighlight>
-					</View>
+					<TouchableOpacity onPress={() => self.makeCall('8023933907')}>
+						<View style = {styles_here.emergency_button}> 
+				            <View style = {[]}>
+									<Text style = {[styles_here.event_text, {fontSize: 30, fontWeight: 'bold', textAlign: 'center', paddingTop: 15, paddingBottom: 15}]}> 911 </Text>									            
+				              <Icon name = "phone" size = {35}/> 
+								</View>
+						</View>
+					</TouchableOpacity>
 
-					<View style = {styles_here.emergency_button}> 
-					<TouchableHighlight onPress={() => self.makeCall('8023933907')}>
-			            <View style = {[]}>
-								<Text style = {[styles_here.event_text, {fontSize: 30, fontWeight: 'bold', textAlign: 'center', paddingTop: 15, paddingBottom: 15}]}> 911 </Text>									            
-			              <Icon name = "phone" size = {35}/> 
-							</View>
-			          </TouchableHighlight>
-					</View>
-
-					<View style = {styles_here.emergency_button}> 
-					<TouchableHighlight onPress={() => self.makeCall('8023933907')}>
-			            <View style = {[]}>
-								<Text style = {[styles_here.event_text, {fontSize: 20, paddingTop: 10, paddingBottom: 10, fontWeight: 'bold', textAlign: 'center'}]}> STANFORD POLICE </Text>			
-			              <Icon name = "phone" size = {30}/> 
-
-							</View>
-			          </TouchableHighlight>
-					</View>
-
-
+					<TouchableOpacity onPress={() => self.makeCall('8023933907')}>
+						<View style = {styles_here.emergency_button}> 
+				            <View style = {[]}>
+									<Text style = {[styles_here.event_text, {fontSize: 20, paddingTop: 10, paddingBottom: 10, fontWeight: 'bold', textAlign: 'center'}]}> STANFORD POLICE </Text>			
+				              <Icon name = "phone" size = {30}/>
+								</View>
+						</View>
+					</TouchableOpacity>
 				</ScrollView>
 			</View>
 
@@ -479,20 +473,19 @@ closeModal = () => {
   	this.setState({isModalVisible: false});
   }
 
-	render() {
-		return (
+render() {
+	return (
 			<View style = {[styles.container, {justifyContent: 'space-around'}]}>
-			<Text style = {[styles_here.section_header, {textAlign: 'center', fontSize: 30}]}> HEY, YOU :) </Text>
-
-			<Text style = {[styles_here.section_header, {}]}> Who's Sober? </Text>
-			{this.display_sober_ppl()}
-			<Text style = {styles.loginText}> How Can I Get Home? </Text>
-			{this.display_navigation_options()}
-			<Text style = {styles.loginText}> Emergency Calls </Text>
-			{this.display_emergency_buttons()}
+				<Text style = {[styles_here.section_header, {textAlign: 'center', fontSize: 30}]}> HEY, YOU :) </Text>
+				<Text style = {[styles_here.section_header, {}]}> Who's Sober? </Text>
+				{this.display_sober_ppl()}
+				<Text style = {styles.loginText}> How Can I Get Home? </Text>
+				{this.display_navigation_options()}
+				<Text style = {styles.loginText}> Emergency Calls </Text>
+				{this.display_emergency_buttons()}
 			</ View>
-		);
-	}
+	);
+}
 }
 
 const mapStateToProps = ({suid}) => ({
@@ -567,8 +560,17 @@ const styles_here = StyleSheet.create({
 		borderWidth: 10,
 		borderColor: 'maroon',
 	},
-	sectionListItem: {
-		backgroundColor: 'maroon',
+	sectionListItemSober: {
+		backgroundColor: '#0098db',
+		padding: 3,
+		height: 130,
+		width: 140,
+		marginVertical: 10,
+		marginHorizontal: 10,
+		borderRadius: 20,
+	},
+	sectionListItemNavigate: {
+		backgroundColor: '#175e54',
 		padding: 3,
 		height: 130,
 		width: 140,

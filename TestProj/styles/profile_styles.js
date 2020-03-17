@@ -17,7 +17,8 @@ const profile_styles = StyleSheet.create({
 		height: 45,
 		//color: 'black',
 		textAlign: 'center',
-		marginBottom: 10
+		marginBottom: 10,
+        borderRadius: 30,
 	},
 	profileTitle: {
 		marginTop: 20

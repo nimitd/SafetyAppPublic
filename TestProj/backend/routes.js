@@ -208,7 +208,7 @@ router.post('/profile_mount', (req, res) => {
 
 router.post('/get_communities', (req, res) => {
 	var suid = req.body.suid;
-	console.log("Received: " + suid);
+	console.log("Received GET COMMUNITIES: " + suid);
 	con.query("SELECT comm_name FROM app_data.communities",
 		(q_err, q_res) => {
           //if(q_err) return next(q_err);

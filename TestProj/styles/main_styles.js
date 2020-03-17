@@ -9,11 +9,15 @@ import { Platform,
 import Constants from 'expo-constants'
 
 const styles = StyleSheet.create({
+	full_container: {
+		flex: 1,
+		backgroundColor: 'black',
+	}, 
 	container: {
 	    flex: 1,
 	    justifyContent: 'center',
 	    backgroundColor: 'black',
-	    marginTop: Constants.statusBarHeight,
+	    paddingTop: Constants.statusBarHeight,
 	},
 	buttonSpaceContainer: {
 		flex: 0.5, 
@@ -43,6 +47,7 @@ const styles = StyleSheet.create({
 		height:45,
 		marginLeft:16,
 		borderBottomColor: '#FFFFFF',
+		color: 'black',
 		flex:1,
 	},
 	buttonContainer: {
@@ -66,6 +71,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		marginLeft: 20,
 		marginRight: 20,
+		backgroundColor: 'white',
 	},
 	welcome: {
 		fontSize: 40,
@@ -77,7 +83,7 @@ const styles = StyleSheet.create({
 	instructions: {
 		fontSize: 20,
 		textAlign: 'center',
-		color: '#333333',
+		color: 'white',
 		marginBottom: 10,
 		margin: 10,
 	},
@@ -89,13 +95,13 @@ const styles = StyleSheet.create({
 	phonenumber: {
 		fontSize: 20,
 		textAlign: 'center',
-		color: '#333333',
+		color: 'white',
 		marginBottom: 10,
 	},
 	warning: {
 		fontSize: 17,
 		textAlign: 'center',
-		color: '#333333',
+		color: 'lightgray',
 		marginBottom: 10,
 		margin: 10,
 	},
@@ -121,11 +127,11 @@ const styles = StyleSheet.create({
 		flex: 1, 
 		flexDirection: 'column',
 		textAlign: 'center',
-		// alignItems: 'center',
-		marginTop: 80,
-		marginLeft: 10,
-		marginRight: 10,
-		marginBottom: 80
+		paddingTop: 80,
+		paddingLeft: 10,
+		paddingRight: 10,
+		paddingBottom: 80,
+		backgroundColor: 'black',
 	},
 	textInput: {
 		fontSize: 20
@@ -136,7 +142,7 @@ const styles = StyleSheet.create({
 		marginVertical: 6,
 		marginHorizontal: 10,
 		borderRadius: 20,
-
+		alignItems: 'center',
 	},
 	text: {
 		fontSize: 16,

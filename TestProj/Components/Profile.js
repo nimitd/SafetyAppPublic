@@ -61,6 +61,7 @@ class Profile extends Component {
       communities : [],
       events : ['Nimit On Call 3/20', 'Full Moon On the Quad', 'Nomad', 'Xanadu Special D'],
       refresh : true,
+      uri: props.suid.uri,
     }
 
     this.getData();
@@ -105,7 +106,7 @@ renderExample = (arr) => {
 
     const body = {suid: this.state.suid};
 
-    axios.post(self.props.suid.uri + '/profile_mount', body)
+    axios.post(this.state.uri + '/profile_mount', body)
       .then(res =>  {
 
         var communitiesArray = [];
@@ -134,7 +135,7 @@ renderExample = (arr) => {
 
     const body = {suid: suid, first_name: firstName, last_name: lastName, phone_number: phoneNumber};
 
-    axios.post(this.props.suid.uri + '/update_profile', body)
+    axios.post(this.state.uri + '/update_profile', body)
       .then(res =>  {
 
       }).catch((error) => {
@@ -243,14 +244,7 @@ renderExample = (arr) => {
 
           <View style={profile_styles.profileSeparator}></View>
 
-          <Text style={profile_styles.profileSectionTitle}>My Events</Text>
-
-          <Text style={profile_styles.profileInfoTitle}>Upcoming Events</Text>
-
-          {this.renderExample(this.state.events)}
-
-          <Text style={profile_styles.profileInfoTitle}>Past Events</Text>
-
+         
         </ScrollView>
 
         
@@ -320,6 +314,7 @@ const styles2 = StyleSheet.create({
     marginVertical: 10,
     textAlign: 'center',
     //fontSize: '20',
+    borderRadius: 30,
   },
   title: {
     textAlign: 'center',

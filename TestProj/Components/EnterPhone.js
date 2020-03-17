@@ -23,7 +23,7 @@ class EnterPhone extends Component {
   constructor(props) {
     super(props);
     // this.login = props.onLogin;
-    this.suid = props.suid;
+    this.suid = props.suid.suid;
     this.state = {hasSubmitted: false, phonenumber: '',}
     }
 
@@ -54,6 +54,7 @@ class EnterPhone extends Component {
               editable
               maxLength={10}
               placeholder="000-000-0000"
+              placeholderTextColor = 'lightgray'
               returnKeyType='done'
               keyboardType='phone-pad'
               onSubmitEditing= {(event) => this.setState({phonenumber: event.nativeEvent.text})}

@@ -118,13 +118,18 @@ class LocationSharing extends Component {
   createMembers() {
     const members = this.current_members;
     toReturn = members.map(member => {
-      // console.log(member);
       const {location, id, color} = member;
       return (
-        <View key={member.id} style={styles.member}>
-          <View style={[styles.avatar, {backgroundColor: color}]}/>
-          <Text style={styles.memberName}>{id}</Text>
-        </View>
+        
+          <TouchableOpacity  onPress={()=>{
+          this.map.fitToSuppliedMarkers([id], true);
+        }}>
+            <View key={member.id} style={styles.member}>
+              <View style={[styles.avatar, {backgroundColor: color}]}/>
+              <Text style={styles.memberName}>{id}</Text>
+            </View>
+          </TouchableOpacity>
+        
       );
     });
     return toReturn;
@@ -338,12 +343,12 @@ class LocationSharing extends Component {
         >
           {this.createMarkers()}
         </MapView>
-        <TouchableHighlight onPress={()=>{this.shareLocation()}}>
-           <View style={styles.sendButton}>
-               <Icon reverse name = "send" size = {24}/>
-           </View>
-        </TouchableHighlight>
-        <View pointerEvents="none" style={styles.members}>
+        <View style={styles.sendButton}>
+          <TouchableOpacity onPress={()=>{this.shareLocation()}}>
+                 <Icon reverse name = "send" size = {24}/>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.members}>
           {this.createMembers()}
         </View>
         <View style={styles.buttonContainer}>
@@ -351,7 +356,7 @@ class LocationSharing extends Component {
             onPress={() => this.fitToMarkersToMap()}
             style={[styles.bubble, styles.button]}
           >
-            <Text>Fit Markers Onto Map</Text>
+            <Text>Show all Friends</Text>
           </TouchableOpacity>
         </View>
         <View style = { styles.buttonContainer2 }>
@@ -363,30 +368,35 @@ class LocationSharing extends Component {
               <Text>Who can see me?</Text>
           </TouchableOpacity>     
         </View>
-        <Modal
-            animationType = {"slide"}
-            transparent={true}
-            visible={this.state.isVisible}
-            propagateSwipe={true}
-            backgroundColor="transparent"
-            onBackdropPress={() => this.setState({ isVisible: false })}>
-            <View style={styles.container_modal}>
-                <FlatList 
-                  data={this.state.subscribers}
-                  keyExtractor={ (item) => item}
-                  renderItem={({ item }) => 
-                    <View  style={styles.sectionListItem}>
-                      <TouchableHighlight onPress={() => this.stopSharing(item)}>
-                        <Text style={styles.text}>{item}</Text>
-                      </TouchableHighlight>
-                      <Icon reverse name = "delete" size = {24}/>
-                    </View>
-                  }
-                  keyExtractor={item => item}
-
-                />
-            </View>
-        </Modal>
+        <View style={styles.container_modal}>
+          <Modal
+              animationType = {"slide"}
+              transparent={true}
+              visible={this.state.isVisible}
+              propagateSwipe={true}
+              backgroundColor="transparent"
+              onBackdropPress={() => this.setState({ isVisible: false })}>
+                <View style = {styles.insideModal}>
+                  <FlatList 
+                    data={this.state.subscribers}
+                    keyExtractor={ (item) => item}
+                    renderItem={({ item }) => 
+                          <View  style={styles.sectionListItem}>
+                            <View style = {styles.title}>
+                              <Text style={[styles.title, {color:'white'}]}>{item}</Text>
+                              <View style = {styles.test}>
+                                <TouchableOpacity onPress={() => this.stopSharing(item)}>
+                                  <View><Icon reverse name = "delete" size = {24}/></View>
+                                </TouchableOpacity>                                
+                              </View>
+                            </View>
+                          </View>
+                    }
+                    keyExtractor={item => item}
+                  />
+                </View>
+          </Modal>
+        </View>
         
       </View>
     );
@@ -429,19 +439,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  container_modal: {
-    flex: 1,
-    alignItems: 'center',
-    marginTop: 300,
+  insideModal:{
+    width: 300, 
+    height: 620, 
+    justifyContent: 'center',
   },
-  sendButton: {
-    position: 'relative',
-    // width: 50,
-    // height: 50,
+  modal:{
+    backgroundColor:'lightgrey',
+    justifyContent: 'center',
+    textAlign: 'center',
+    borderWidth: 10,
+    borderColor: 'maroon',
+  },
+  container_modal: {
+    flex: 0,
+    alignItems: 'flex-end',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    left: 150,
-    top: 0,
+    color: 'white',
+  },
+  sendButton: {
+    position: 'absolute',
+    width: 50,
+    height: 50,
+    right: 27,
+    bottom: 150,
   },
   sectionListItem: {
     backgroundColor: 'maroon',
@@ -449,6 +472,19 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     marginHorizontal: 10,
     borderRadius: 20,
+    alignItems: 'center',
+  },
+  title: {
+    color: 'white',
+    fontSize: 24,
+    textAlign: 'right',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  test: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
   },
   modal: {
     justifyContent: 'flex-end',

@@ -48,9 +48,11 @@ class Register extends Component {
     const body = {first_name: this.state.first_name, last_name: this.state.last_name,
         suid: this.state.suid, dorm: this.state.dorm};
     console.log(body);
+    self = this;
     axios.post(this.props.suid.uri + '/send_prelim_user_data', body)
         .then(res =>  {
-          this.props.navigation.navigate('Phone', {suid: this.state.suid});
+          self.props.changeSUID(self.state.suid);
+          self.props.navigation.navigate('Phone');
         })
         .catch((error) => {
           if (error.response){
@@ -69,10 +71,8 @@ class Register extends Component {
 
 render() {
     return (
-    <View style = {styles.container}>
-    <View style = {styles.textboxcontainers}>
-      <Text style = {styles.header}> Enter your information below to get started. </Text>
-	    
+    <View style = {[styles.container, {alignItems: 'center'}]}>
+      <Text style = {[styles.header], {color: "white", paddingBottom: 50, fontSize: 20}}> Enter your information below to get started. </Text>
 
       <View style={styles.inputContainer}>
         <TextInput style={styles.inputs}
@@ -86,44 +86,15 @@ render() {
             onChangeText={(last_name) => this.setState({last_name})}/>
       </View>
 
-
 	    <View style={styles.inputContainer}>
           <TextInput style={styles.inputs}
               placeholder="SUID (eg: gitakris)"
               onChangeText={(suid) => this.setState({suid})}/>
-        </View>
       </View>
 
-       <View style = {styles.dropdown}>
-          <Dropdown
-              onChangeText={(dorm) => this.setState({dorm})}
-    		        label='Choose your residence'
-    		        data={[
-    		        {value: 'Mars'},
-    		        {value: '680'},
-    		       	{value: 'Xanadu'},
-    		        {value: 'Casa'},
-    		        {value: 'Bob'},
-    		        {value: 'Storey'},
-    		        {value: 'Grove'},
-    		        {value: 'Slav'},
-    		        {value: 'Haus Mitt'},
-    		        {value: 'Phi Sig'},
-    		        {value: 'Kairos'},
-    		        {value: 'EBF'},
-    		        {value: 'Synergy'},
-    		       	{value: 'Durand'},
-
-    		        ]}
-    		      />
-		    </View>
-    		<View style = {styles.buttonSpaceContainer}>
-    		  <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
-            <Text style={styles.loginText}>Register</Text>
-          </TouchableHighlight>
-        </View>
-
-
+		  <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
+        <Text style={styles.loginText}>Register</Text>
+      </TouchableHighlight>
 
      </View>
     );
