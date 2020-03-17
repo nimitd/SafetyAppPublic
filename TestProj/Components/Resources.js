@@ -289,16 +289,12 @@ display_contacts() {
 
   render() {
     return (
-
-
       <SafeAreaView style = {styles.container}>
-      <Text style={styles_here.search}> Search </Text>
-      <TextInput  
-        style={{ height: 40, borderColor: 'gray', borderWidth: 3 , color: 'white'}}
-        placeholder='Search'
-        placeholderStyle={styles_here.header}
-        onChangeText={(term) => this.searchUpdated(term)} />
-
+        <TextInput  
+          style={{ height: 40,  borderWidth: 3 , color: 'white', paddingLeft:18, fontSize:20}}
+          placeholder='Search...'
+          placeholderTextColor='gray'
+          onChangeText={(term) => this.searchUpdated(term)} />
       {this.display_contacts()}
       </SafeAreaView>
       );
@@ -345,7 +341,7 @@ const styles_here = StyleSheet.create({
   }, 
   title: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 20,
     textAlign: 'right',
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -357,5 +353,6 @@ const styles_here = StyleSheet.create({
   	textAlign: 'center',
   	borderWidth: 10,
   	borderColor: 'maroon',
+    marginTop: 200,
   }
 });

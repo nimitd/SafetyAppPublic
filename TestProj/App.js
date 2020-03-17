@@ -46,45 +46,45 @@ import { connect } from 'react-redux';
 import { changeSUID } from './actions/suids';
 import { bindActionCreators } from 'redux';
 
+// hide warnings
+console.disableYellowBox = true;
 
-// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-// ./ngrok http 3000
-const uri = 'http://039130de.ngrok.io';
 
 const OnboardingStack = createStackNavigator({
   Landing: {
     screen: Register,
     navigationOptions: {
+      headerShown: false,
     },
   },
   Phone: {
     screen: EnterPhone,
     navigationOptions: {
-      headerTitle: 'Sign In',
+      headerShown: false,
     },
   },
   CreateJoin: {
     screen: CreateOrJoin,
     navigationOptions: {
-      headerTitle: 'Create Account',
+      headerShown: false,
     },
   },
   Join: {
     screen: JoinCommunity,
     navigationOptions: {
-      headerTitle: 'Create Account',
+      headerShown: false,
     },
   },
   Create: {
     screen: MakeCommunity,
     navigationOptions: {
-      headerTitle: 'Create Account',
+      headerShown: false,
     },
   },
   Code: {
     screen: EnterCode,
     navigationOptions: {
-      headerTitle: 'Create Account',
+      headerShown: false,
     },
   }
 }, {initialRouteName: 'Landing'})
@@ -94,19 +94,19 @@ const ProfileStack = createStackNavigator({
   Profile: {
     screen: Profile,
     navigationOptions: {
-      headerTitle: 'Profile',
+      headerShown: false,
     },
   },
   Join: {
     screen: JoinCommunity,
     navigationOptions: {
-      headerTitle: 'Join Community',
+      headerShown: false,
     },
   },
   MakeCommunity: {
     screen: MakeCommunity,
     navigationOptions: {
-      headerTitle: 'Make Community',
+      headerShown: false,
     },
   },
 }, {initialRouteName: 'Profile'})
@@ -144,7 +144,26 @@ const MainApp = createBottomTabNavigator({
         )
     }
   },
-});
+},
+{
+    tabBarOptions: {
+        activeTintColor: 'white',
+        inactiveTintColor: 'gray',
+        swipeEnabled: false,
+        showLabel: true,
+        showIcon: true,
+        style: {
+          backgroundColor: 'black',
+          paddingVertical: 10,
+          height: 60
+        },
+        labelStyle: {
+          color: "lightgray",
+        } 
+      }
+    },
+
+);
 
 
 // const mapStateToProps = state => ({
@@ -169,7 +188,7 @@ const Switch = createAppContainer(createSwitchNavigator(
   },
   {
     initialRouteName: 'AuthLoading',
-  }
+  },
 ));
 
 import { Provider } from 'react-redux';
