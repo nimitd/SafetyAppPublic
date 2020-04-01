@@ -1,5 +1,3 @@
-// cite: https://www.bootdey.com/react-native-snippet/9/Login-form-ui-example
-
 import React, { Component } from 'react';
 import {
   StyleSheet,
@@ -12,8 +10,7 @@ import {
   Picker
 } from 'react-native';
 
-//import CreateOrJoin from './Components/CreateOrJoin';
-//import * as Components from './Components';
+// component imports
 import EnterPhone from './Components/EnterPhone'
 import Register from './Components/Register'
 import CreateOrJoin from './Components/CreateOrJoin'
@@ -27,12 +24,8 @@ import Home from './Components/Home'
 import Resources from './Components/Resources'
 import Profile from './Components/Profile'
 
-
-// backend connect code
-import Constants from "expo-constants";
-const { manifest } = Constants;
+// backend imports
 import axios from 'axios';
-
 
 // navigation imports
 import { createAppContainer, createSwitchNavigator, StackNavigator, SwitchNavigator } from 'react-navigation';
@@ -41,15 +34,15 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-// Redux App
+// redux imports
 import { connect } from 'react-redux';
 import { changeSUID } from './actions/suids';
 import { bindActionCreators } from 'redux';
 
-// hide warnings
+// temp: hide warnings for expo
 console.disableYellowBox = true;
 
-
+// navigator for user and community account creation
 const OnboardingStack = createStackNavigator({
   Landing: {
     screen: Register,
@@ -89,7 +82,7 @@ const OnboardingStack = createStackNavigator({
   }
 }, {initialRouteName: 'Landing'})
 
-
+// navigator for profile tab
 const ProfileStack = createStackNavigator({
   Profile: {
     screen: Profile,
@@ -111,6 +104,8 @@ const ProfileStack = createStackNavigator({
   },
 }, {initialRouteName: 'Profile'})
 
+
+// navigator for main app interface and bottom tab navigator
 const MainApp = createBottomTabNavigator({
   Home: {
     screen: Home,
@@ -165,21 +160,7 @@ const MainApp = createBottomTabNavigator({
 
 );
 
-
-// const mapStateToProps = state => ({
-//   suid: state.suid,
-// });
-
-// const ActionCreators = Object.assign(
-//   {},
-//   changeSUID,
-// );
-
-// const mapDispatchToProps = dispatch => ({
-//   actions: bindActionCreators(ActionCreators, dispatch),
-// });
-
-
+// temp: switch navigator for demo
 const Switch = createAppContainer(createSwitchNavigator(
   {
     AuthLoading: {screen: Loading},
@@ -208,66 +189,10 @@ export default class App extends Component {
   }
 }
 
-
-// export default connect(mapStateToProps, mapDispatchToProps)(App);
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#DCDCDC',
-  },
-  buttonSpaceContainer: {
-    flex: 0.5, 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textboxcontainers: {
-    alignItems: 'center',
-  },
-  header: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 30,
-  },
-  inputContainer: {
-      borderBottomColor: '#F5FCFF',
-      backgroundColor: '#FFFFFF',
-      borderRadius:30,
-      borderBottomWidth: 1,
-      width:250,
-      height:45,
-      marginBottom:20,
-      flexDirection: 'row',
-      alignItems:'center',
-  },
-  inputs:{
-      height:45,
-      marginLeft:16,
-      borderBottomColor: '#FFFFFF',
-      flex:1,
-  },
-  buttonContainer: {
-    height:45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom:20,
-    width:250,
-    borderRadius:30,
-  },
-  loginButton: {
-    backgroundColor: "maroon",
-  },
-  loginText: {
-    color: 'white',
-    fontSize: 20,
-  },
-  dropdown: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
   },
 });

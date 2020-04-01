@@ -5,10 +5,7 @@ import {
   SafeAreaView,
   Alert,
   TouchableHighlight,
-
 } from 'react-native';
-import Constants from 'expo-constants'
-const { manifest } = Constants;
 
 import {styles} from '../styles/main_styles'
 
@@ -26,9 +23,6 @@ class CreateOrJoin extends Component {
 
 constructor(props) {
     super(props);
-
-    // this.clicked_button=props.onCommunityClick;
-
   }
 
   on_make_button_click = () => { 
@@ -39,10 +33,8 @@ constructor(props) {
     this.props.navigation.navigate('Join');
   }
 
-
   render() {
     return (
-
       <View style = {styles.container}>
         <View style = {styles.buttonSpaceContainer}>
           <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.on_make_button_click}>
@@ -56,7 +48,6 @@ constructor(props) {
           </TouchableHighlight>
         </View>
       </View>
-      
     );
   }
 }

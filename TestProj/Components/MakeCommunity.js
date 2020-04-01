@@ -9,19 +9,11 @@ import { Platform,
 import { Dropdown } from 'react-native-material-dropdown';
 import {styles} from '../styles/main_styles'
 
-import Constants from "expo-constants";
-const { manifest } = Constants;
 import axios from 'axios';
 
 // Redux Imports
 import { connect } from 'react-redux';
 import { changeSUID } from '../actions/suids';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
-});
-
 
 class MakeCommunity extends Component {
 	constructor(props) {
@@ -38,36 +30,21 @@ class MakeCommunity extends Component {
   	}
 
   	makeNewCommunity = (suid, communityName) => {
-
     	const body = {suid: suid, comm_name: communityName,};
-
 	    axios.post(this.props.suid.uri + '/make_community', body)
-	      .then(res =>  {
-
-	      	// var communitiesArray = [];
-
-	       //  res.data.forEach(function (item, index) {
-	       //        communitiesArray.push(item.comm_name);
-	       //    });
-
-	       //  var dataArray = Array(communitiesArray.length)
-	       //      .fill('')
-	       //      .map((_, i) => ({ value: communitiesArray[i]}));
-
-	       //  this.setState({data : dataArray});
-
-	      }).catch((error) => {
-	          console.log(error);
-    	});
+	      	.then(res =>  {}).catch((error) => {
+	        	console.log(error);
+    		});
   	}
 
 	render() {
 		return (
 			<View style={[styles.page, {alignItems: 'center'},]}>
 				<View style={{
-		          			flexDirection: 'row', 
-		          			justifyContent:'space-between',
-		          			marginBottom: 40,}}>
+          			flexDirection: 'row', 
+          			justifyContent:'space-between',
+          			marginBottom: 40,}}
+          		>
 					<Text style={{textAlign: 'center', fontSize: 20, color: 'white'}}>Create a new community here. Typically, communites represent dorms, greek orgs, or other clubs.</Text>		
 		        </View>
 				<Text style={styles.text}> Give your community a name: </Text>
@@ -76,7 +53,8 @@ class MakeCommunity extends Component {
 						style={styles.inputs}
         				placeholder="Enter Your Community Name Here."
           				onChangeText={(comm_name) => this.setState({comm_name})}
-          				value={this.state.comm_name}/>
+          				value={this.state.comm_name}
+          			/>
           		</View>
 	          	<Text style={styles.text}>If your community name is something that might be repeated each year (i.e. Mars) we suggest you put the school year in your name (i.e. Mars 2019-2020).</Text>
           		<View style={{flexDirection: 'column', justifyContent: 'center', paddingVertical: 50}}>

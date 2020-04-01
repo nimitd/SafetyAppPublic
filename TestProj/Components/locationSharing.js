@@ -14,12 +14,8 @@ import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import * as Permissions from 'expo-permissions';
 import Modal from "react-native-modal";
 import { Icon } from 'react-native-elements'
-
 import { ListItem } from 'react-native-elements'
 
-
-import Constants from "expo-constants";
-const { manifest } = Constants;
 import axios from 'axios';
 
 const screen = Dimensions.get('window');
@@ -32,10 +28,8 @@ const SCALEDRONEID = 'ck9tuUkzlzPvEaG0'
 // Redux Imports
 import { connect } from 'react-redux';
 import { changeSUID } from '../actions/suids';
-// import { bindActionCreators } from 'redux';
 
 class LocationSharing extends Component {
-
   constructor(props) {
     super();
     this.state = {
@@ -53,24 +47,24 @@ class LocationSharing extends Component {
   getSubscribers() {
     self = this;
     axios.post(self.props.suid.uri + '/get_subscribers', {suid: self.props.suid.suid})
-          .then(res =>  {
-            console.log(res.data);
-            subs = self.state.subscribers;
-            res.data.forEach(function (item, index) {
-              // do something
-              console.log("suid getting back is: " + item.suid);
-              subs.push(item.suid);
-            });
-            self.setState({subscribers: subs});
-          }) 
-          .catch((error) => {
-            if (error.response){
-              if (error.response.status == 401) {
-                Alert.alert("User with SUID already exists, please enter unique SUID")
-              }
-            console.log(error)
-            }
-        });    
+      .then(res =>  {
+        console.log(res.data);
+        subs = self.state.subscribers;
+        res.data.forEach(function (item, index) {
+          // do something
+          console.log("suid getting back is: " + item.suid);
+          subs.push(item.suid);
+        });
+        self.setState({subscribers: subs});
+      }) 
+      .catch((error) => {
+        if (error.response){
+          if (error.response.status == 401) {
+            Alert.alert("User with SUID already exists, please enter unique SUID")
+          }
+        console.log(error)
+        }
+      });    
   }
 
   add_member(data)  {
@@ -98,9 +92,6 @@ class LocationSharing extends Component {
     this.forceUpdate();
   }
 
-
-
-
   startLocationTracking(callback) {
     navigator.geolocation.watchPosition(
       callback,
@@ -113,23 +104,19 @@ class LocationSharing extends Component {
     );
   }
 
-  
-
   createMembers() {
     const members = this.current_members;
     toReturn = members.map(member => {
       const {location, id, color} = member;
       return (
-        
           <TouchableOpacity  onPress={()=>{
-          this.map.fitToSuppliedMarkers([id], true);
-        }}>
+            this.map.fitToSuppliedMarkers([id], true);}}
+          >
             <View key={member.id} style={styles.member}>
               <View style={[styles.avatar, {backgroundColor: color}]}/>
               <Text style={styles.memberName}>{id}</Text>
             </View>
           </TouchableOpacity>
-        
       );
     });
     return toReturn;
@@ -160,46 +147,48 @@ class LocationSharing extends Component {
     this.map.fitToSuppliedMarkers(members.map(m => m.id), true);
   }
 
-
   showSubscribedLocations() {
     self = this;
     axios.post(self.props.suid.uri + '/get_rooms_sd', {suid: self.props.suid.suid})
-        .then(res =>  {
-          console.log("Query getting back size: " + self.props.suid.suid + res.data.length);
-          res.data.forEach(function (item, index) {
-            var member = self.current_members.find(m => m.id === item.room_id);
-            if (!member) {
-              const susbribed = self.drone.subscribe('observable-' + item.room_id, {
-                historyCount: 1 // load 50 past messages
-              });
-              // received past message
-              susbribed.on('history_message', message =>  {
-                // self.add_member(message.data);
-              });
-              // received new message
-              susbribed.on('data', (data, member) =>  {
-                if (!data.suid.startsWith("/UPDATE/")){
-                  self.add_member(data);
-                }
-              });
-            }
-          }); 
-        })
-        .catch((error) => {
-          if (error.response){
-            if (error.response.status == 401) {
-              Alert.alert("User with SUID already exists, please enter unique SUID")
-            }
-          console.log(error)
+      .then(res =>  {
+        console.log("Query getting back size: " + self.props.suid.suid + res.data.length);
+        res.data.forEach(function (item, index) {
+          var member = self.current_members.find(m => m.id === item.room_id);
+          if (!member) {
+            const susbribed = self.drone.subscribe('observable-' + item.room_id, {
+              historyCount: 1 // load 50 past messages
+            });
+            // received past message
+            susbribed.on('history_message', message =>  {
+              // self.add_member(message.data);
+            });
+            // received new message
+            susbribed.on('data', (data, member) =>  {
+              if (!data.suid.startsWith("/UPDATE/")){
+                self.add_member(data);
+              }
+            });
           }
+        }); 
+      })
+      .catch((error) => {
+        if (error.response){
+          if (error.response.status == 401) {
+            Alert.alert("User with SUID already exists, please enter unique SUID")
+          }
+          console.log(error)
+        }
       });
   }
 
   componentDidMount() {
     Permissions.askAsync(Permissions.LOCATION);
     const drone = new Scaledrone(SCALEDRONEID);
+
     drone.on('error', error => console.error(error));
+
     drone.on('close', reason => console.error(reason));
+
     drone.on('open', error => {
       if (error) {
         return console.error(error);
@@ -213,41 +202,42 @@ class LocationSharing extends Component {
     const room = drone.subscribe('observable-' + this.props.suid.suid, {
       historyCount: 1 // load 50 past messages
     });
+
     room.on('open', error => {
       if (error) {
         return console.error(error);
       }
       // received new message
       room.on('data', (data, member) => {
-          if (data.suid.startsWith("/UPDATE/"))  {
-            console.log("FORCING RE-RENDER");
-            if (data.suid.startsWith("/UPDATE/DEL/")) {
-              // delete from members list
-              console.log("PRESSED DEL BUTTON");
-              var id_to_delete = data.suid.split("/DEL/")[1];
-              self.current_members = self.current_members.filter(obj => obj.id !== id_to_delete);
-            }
-            this.forceUpdate();
-          } else {
-            console.log("GOT OWN DATA");
-            this.add_member(data);
+        if (data.suid.startsWith("/UPDATE/"))  {
+          console.log("FORCING RE-RENDER");
+          if (data.suid.startsWith("/UPDATE/DEL/")) {
+            // delete from members list
+            console.log("PRESSED DEL BUTTON");
+            var id_to_delete = data.suid.split("/DEL/")[1];
+            self.current_members = self.current_members.filter(obj => obj.id !== id_to_delete);
           }
+          this.forceUpdate();
+        } else {
+          console.log("GOT OWN DATA");
+          this.add_member(data);
         }
-      );
+      });
+
       // new member subscribed to yours
       this.drone = drone;
       self = this;
       room.on('member_join', member => {
         navigator.geolocation.getCurrentPosition(
-           (position) => {
-              const {latitude, longitude} = position.coords;
-              console.log('observable-' + self.props.suid.suid);
-              suid = self.props.suid.suid;
-              self.drone.publish({
-                  room: 'observable-' + suid,
-                  message: {latitude, longitude, suid}
-                });
-            }, error => console.error(error));
+          (position) => {
+            const {latitude, longitude} = position.coords;
+            console.log('observable-' + self.props.suid.suid);
+            suid = self.props.suid.suid;
+            self.drone.publish({
+                room: 'observable-' + suid,
+                message: {latitude, longitude, suid}
+            });
+          }, error => console.error(error));
       });
 
       // start publishing locations to own room
@@ -280,7 +270,6 @@ class LocationSharing extends Component {
       [
         {text: 'No', onPress: () => console.warn('NO Pressed'), style: 'cancel'},
         {text: 'Yes', onPress: () => 
-          
           axios.post(self.props.suid.uri + '/stop_sharing', {suid: suid, subscriber: item})
                 .then(res =>  {
                   console.log(res.data);
@@ -299,8 +288,8 @@ class LocationSharing extends Component {
                 .catch((error) => {
                   console.log(error)
                 })
-          
-      },]
+        },
+      ]
     );
   }
 
@@ -309,28 +298,26 @@ class LocationSharing extends Component {
     suid = this.props.suid.suid;
     self = this;
     Alert.prompt('Who would you like to share your location with (SUID)?', null, name => {
-        axios.post(self.props.suid.uri + '/start_sharing', {suid: suid, subscriber: name})
-                .then(res =>  {
-                  subs = self.state.subscribers;
-                  subs.push(name);
-                  self.drone.publish({
-                    room: 'observable-' + name,
-                    message: {latitude: 0, longitude: 0, suid: '/UPDATE/'}
-                  });
-                  self.setState({subscribers: subs});
-                  })
-                .catch((error) => {
-                  console.log(error)
-                });
-      }
-    );
+      axios.post(self.props.suid.uri + '/start_sharing', {suid: suid, subscriber: name})
+        .then(res =>  {
+          subs = self.state.subscribers;
+          subs.push(name);
+          self.drone.publish({
+            room: 'observable-' + name,
+            message: {latitude: 0, longitude: 0, suid: '/UPDATE/'}
+          });
+          self.setState({subscribers: subs});
+        })
+        .catch((error) => {
+          console.log(error)
+        });
+    });
   }
 
   render() {
     this.showSubscribedLocations();
     return  (
       <View style={styles.container}>
-        
         <MapView
           style={styles.map}
           ref={ref => {this.map = ref;}}
@@ -345,7 +332,7 @@ class LocationSharing extends Component {
         </MapView>
         <View style={styles.sendButton}>
           <TouchableOpacity onPress={()=>{this.shareLocation()}}>
-                 <Icon reverse name = "send" size = {24}/>
+            <Icon reverse name = "send" size = {24}/>
           </TouchableOpacity>
         </View>
         <View style={styles.members}>
@@ -360,67 +347,64 @@ class LocationSharing extends Component {
           </TouchableOpacity>
         </View>
         <View style = { styles.buttonContainer2 }>
-         <TouchableOpacity
-              style={[styles.bubble, styles.button]}
-              onPress={() => {
-                this.displayModal(true);
-              }}>
-              <Text>Who can see me?</Text>
+          <TouchableOpacity
+            style={[styles.bubble, styles.button]}
+            onPress={() => {
+              this.displayModal(true);
+            }}
+          >
+            <Text>Who can see me?</Text>
           </TouchableOpacity>     
         </View>
         <View style={styles.container_modal}>
           <Modal
-              animationType = {"slide"}
-              transparent={true}
-              visible={this.state.isVisible}
-              propagateSwipe={true}
-              backgroundColor="transparent"
-              onBackdropPress={() => this.setState({ isVisible: false })}>
-                <View style = {styles.insideModal}>
-                  <FlatList 
-                    data={this.state.subscribers}
-                    keyExtractor={ (item) => item}
-                    renderItem={({ item }) => 
-                          <View  style={styles.sectionListItem}>
-                            <View style = {styles.title}>
-                              <Text style={[styles.title, {color:'white'}]}>{item}</Text>
-                              <View style = {styles.test}>
-                                <TouchableOpacity onPress={() => this.stopSharing(item)}>
-                                  <View><Icon reverse name = "delete" size = {24}/></View>
-                                </TouchableOpacity>                                
-                              </View>
-                            </View>
-                          </View>
-                    }
-                    keyExtractor={item => item}
-                  />
-                </View>
+            animationType = {"slide"}
+            transparent={true}
+            visible={this.state.isVisible}
+            propagateSwipe={true}
+            backgroundColor="transparent"
+            onBackdropPress={() => this.setState({ isVisible: false })}
+          >
+            <View style = {styles.insideModal}>
+              <FlatList 
+                data={this.state.subscribers}
+                keyExtractor={ (item) => item}
+                renderItem={({ item }) => 
+                  <View  style={styles.sectionListItem}>
+                    <View style = {styles.title}>
+                      <Text style={[styles.title, {color:'white'}]}>{item}</Text>
+                      <View style = {styles.test}>
+                        <TouchableOpacity onPress={() => this.stopSharing(item)}>
+                          <View><Icon reverse name = "delete" size = {24}/></View>
+                        </TouchableOpacity>                                
+                      </View>
+                    </View>
+                  </View>
+                }
+                keyExtractor={item => item}
+              />
+            </View>
           </Modal>
         </View>
-        
       </View>
     );
   } 
 }
 
-
-
-
-
 function doAuthRequest(clientId, name, uri) {
-    let status;
-    return axios.post(uri + "/auth", {clientId: clientId, name: name})
-      .then(res => {
-      status = res.status; 
-      return res.data;
-    }).then(text => {
-      if (status === 200) {
-        return text;
-      } else {
-        alert(text);
-      }
-    }).catch(error => console.error(error));
-  }
+  let status;
+  return axios.post(uri + "/auth", {clientId: clientId, name: name})
+    .then(res => {
+    status = res.status; 
+    return res.data;
+  }).then(text => {
+    if (status === 200) {
+      return text;
+    } else {
+      alert(text);
+    }
+  }).catch(error => console.error(error));
+}
 
 const mapStateToProps = ({suid}) => ({
    suid

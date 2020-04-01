@@ -10,8 +10,6 @@ import { Platform,
 import EnterCode from './EnterCode';
 import {styles} from '../styles/main_styles'
 
-import Constants from "expo-constants";
-const { manifest } = Constants;
 import axios from 'axios';
 
 // Redux Imports
@@ -22,7 +20,6 @@ class EnterPhone extends Component {
 
   constructor(props) {
     super(props);
-    // this.login = props.onLogin;
     this.suid = props.suid.suid;
     this.state = {hasSubmitted: false, phonenumber: '',}
     }
@@ -48,18 +45,18 @@ class EnterPhone extends Component {
     return(
       <View style = {styles.container}>
         <KeyboardAvoidingView style={styles.container}>
-            <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
-            <Text style={styles.instructions}>To sign up, please enter your phone number:</Text>
-            <TextInput style={styles.phonenumber}
-              editable
-              maxLength={10}
-              placeholder="000-000-0000"
-              placeholderTextColor = 'lightgray'
-              returnKeyType='done'
-              keyboardType='phone-pad'
-              onSubmitEditing= {(event) => this.setState({phonenumber: event.nativeEvent.text})}
-            />
-            <Text style={styles.warning}>(Don't worry, we will never share your number with anyone without your permission.)</Text>
+          <Text style={styles.welcome}>Welcome to Stanford Safety.</Text>
+          <Text style={styles.instructions}>To sign up, please enter your phone number:</Text>
+          <TextInput style={styles.phonenumber}
+            editable
+            maxLength={10}
+            placeholder="000-000-0000"
+            placeholderTextColor = 'lightgray'
+            returnKeyType='done'
+            keyboardType='phone-pad'
+            onSubmitEditing= {(event) => this.setState({phonenumber: event.nativeEvent.text})}
+          />
+          <Text style={styles.warning}>(Don't worry, we will never share your number with anyone without your permission.)</Text>
         </KeyboardAvoidingView>
         <View style = {styles.buttonSpaceContainer}>
           <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.logPhoneNumber}>

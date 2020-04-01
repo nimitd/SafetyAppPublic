@@ -21,11 +21,6 @@ function Separator() {
 }
 
 class Loading extends Component {
-
-  // constructor(props) {
-  //     super(props);
-  //   }
-
   sendToOnboarding = () => {
     this.props.navigation.navigate('Onboarding');
   }
@@ -57,7 +52,6 @@ class Loading extends Component {
           </TouchableHighlight>
         </View>
       </View>
-      
     );
   }
 }

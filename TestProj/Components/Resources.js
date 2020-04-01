@@ -20,8 +20,6 @@ import {
 import CreateOrJoin from './CreateOrJoin';
 import { Dropdown } from 'react-native-material-dropdown';
 
-import Constants from "expo-constants";
-const { manifest } = Constants;
 import axios from 'axios';
 
 import {styles} from '../styles/main_styles'
@@ -34,8 +32,6 @@ import Modal from 'react-native-modal';
 // Redux Imports
 import { connect } from 'react-redux';
 import { changeSUID } from '../actions/suids';
-
-
 
 const DATA = [
   {
@@ -62,7 +58,6 @@ const DATA_CONTACTS = {
   'ResEd': {'phone': '6507252800', 'email': 'residentialeducation@stanford.edu'},
   'OAPE': {'phone': '6507255947', 'email': 'alcohol@stanford.edu'},
 
-
   'RA': {'phone': '6232155170', 'sms': '6232155170', 'email': 'caps@stanford.edu'},
   'RCC': {'phone': '6232155170', 'sms': '6232155170', 'email': 'caps@stanford.edu'},
   'PHE': {'phone': '6232155170', 'sms': '6232155170', 'email': 'caps@stanford.edu'},
@@ -75,29 +70,22 @@ const DATA_CONTACTS = {
 
 const DATA_INFORMATION = {
 	'CAPS': 'Counseling & Psychological Services at Vaden Health Center provides 24/7 support, psychiatric consults, groups and workshops, and other resources geared at maintaining the well-being of the Stanford Community.'
-
-
 }
 
 var new_data = {}
 
-
-
 function Item({ title }) {
-    return (
-      <View style={styles.sectionListItem}>
+  return (
+    <View style={styles.sectionListItem}>
       <Icon name='phone-call'/>
-
-        <TouchableHighlight onPress={() => makeCall({title})}>
-                <Text style={styles.text}>{title}</Text>
-              </TouchableHighlight>
-      </View>
-      
-    );
+      <TouchableHighlight onPress={() => makeCall({title})}>
+        <Text style={styles.text}>{title}</Text>
+      </TouchableHighlight>
+    </View>
+  );
 }
 
 class Resources extends Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -106,9 +94,7 @@ class Resources extends Component {
       isModalVisible: false,
       modalTitle: '',
     }
-
     this.populate_data();
-
   }
 
   populate_data = () => {
@@ -123,11 +109,6 @@ class Resources extends Component {
               console.log("INDEX: ", index);
               console.log(item["description"]);
               new_data[item["name"]] = {}
-              // new_data[item["name"]].push({"description": item["description"], "phone": item["phone_num"], "email": item["email"]});
-              // new_data.push({
-              //   key: item.["name"],
-              //   value: {"description": item["description"], "phone": item["phone_num"], "email": item["email"]}
-              // });
               console.log("NEW DATA: ", new_data);
             }); 
           })
@@ -148,15 +129,14 @@ class Resources extends Component {
          prompt: true // Optional boolean property. Determines if the user should be prompt prior to the call 
      }
     call(args).catch(console.error)
-  
   }
 
   sendText = (number) => {
-        Linking.openURL('sms:'+number+"&body=Hi! I need help.");
-    }
+    Linking.openURL('sms:'+number+"&body=Hi! I need help.");
+  }
 
   sendEmail = (email) => {
-        Linking.openURL('mailto:'+email);
+    Linking.openURL('mailto:'+email);
   }
 
   openModal = (title) => {
@@ -169,10 +149,7 @@ class Resources extends Component {
   }
 
   get_page_info = (title) => {
-  	// console.log("title: ", title);
   	return DATA_INFORMATION[this.state.modalTitle];
-  	// console.log("sdkf " + DATA_INFORMATION[title] + title);
-  	// return DATA_INFORMATION[title];
   }
 
    get_number_info = () => {
@@ -182,25 +159,13 @@ class Resources extends Component {
    get_email_info = () => {
    	 return DATA_CONTACTS[this.state.modalTitle]==undefined ? "" : DATA_CONTACTS[this.state.modalTitle]['email'];
   }
-// <View style={{marginTop:50}}>
-// 			<TouchableOpacity onPress = {()=> this.openModal()}>
-// 				<Text style={{textAlign:'center'}}>Click to open the modal</Text>
-// 			</TouchableOpacity>
-// 			<Modal isVisible={this.state.isModalVisible} style={styles_here.modal}>
-// 				<View style={{ flex: 1 }}>
-// 					<Text>This is the modal content for now!</Text>
-// 				</View> 
-// 			</Modal>
-// 		</View>
-
 
 display_item(title) {
-  // console.log(title, DATA_CONTACTS[title]["sms"]==undefined, );
   return (
     <View style={styles.sectionListItem}>
       <View style={styles_here.title}>
-         <Text style={styles_here.title}>{title}</Text>
-         <View style = {styles_here.test}>
+        <Text style={styles_here.title}>{title}</Text>
+        <View style = {styles_here.test}>
           <TouchableHighlight onPress={() => this.makeCall(DATA_CONTACTS[title]["phone"])}>
             <View>
               <Icon reverse name = "phone" size = {12}/>
@@ -218,38 +183,30 @@ display_item(title) {
               <Icon reverse name = "email" size = {12}/>
             </View>
           </TouchableHighlight>
-           <TouchableHighlight onPress={() => this.openModal(title)}>
+          <TouchableHighlight onPress={() => this.openModal(title)}>
             <View>
-             <Icon reverse name = "expand-more" size = {12}/>
-
-             <Modal isVisible={this.state.isModalVisible} style={styles_here.modal} onBackdropPress={()=>this.closeModal()}>
-
-				<View style = {styles_here.info_text}>
-
-					<Text>{this.get_page_info(title)}</Text>
-				</View> 
-				<TouchableOpacity onPress={() => this.makeCall(DATA_CONTACTS[title]["phone"])}>
-				<View style = {{flexDirection: 'row'}}>
-              		<Icon reverse name = "phone" size = {10}/>
-					<Text style = {{marginVertical: 10, color: 'blue', textDecorationLine: 'underline'}}>{this.get_number_info()}</Text>
-            	</View>
-          		</TouchableOpacity>
-
-
-            	<View style = {{flexDirection: 'row'}}>
-              		<Icon reverse name = "email" size = {10}/>
-              		<Text style = {{marginVertical: 10}}> {this.get_email_info()} </Text>
-            	</View>
-			</Modal>
-			</View>
+              <Icon reverse name = "expand-more" size = {12}/>
+              <Modal isVisible={this.state.isModalVisible} style={styles_here.modal} onBackdropPress={()=>this.closeModal()}>
+  			        <View style = {styles_here.info_text}>
+  			          <Text>{this.get_page_info(title)}</Text>
+  			        </View> 
+  			        <TouchableOpacity onPress={() => this.makeCall(DATA_CONTACTS[title]["phone"])}>
+  			          <View style = {{flexDirection: 'row'}}>
+              		  <Icon reverse name = "phone" size = {10}/>
+  				           <Text style = {{marginVertical: 10, color: 'blue', textDecorationLine: 'underline'}}>{this.get_number_info()}</Text>
+            	     </View>
+          		  </TouchableOpacity>
+              	<View style = {{flexDirection: 'row'}}>
+                		<Icon reverse name = "email" size = {10}/>
+                		<Text style = {{marginVertical: 10}}> {this.get_email_info()} </Text>
+              	</View>
+              </Modal>
+            </View>
           </TouchableHighlight>
-
-          </View>
-     </View>
-  </View>
-
-
-    );
+        </View>
+      </View>
+    </View>
+  );
 }
 
 searchUpdated = (input) => {
@@ -268,7 +225,6 @@ searchUpdated = (input) => {
       	})
         let item_copy = JSON.parse(JSON.stringify(item));
         item_copy.data = matchedDataArray;
-        // console.log(item_copy);
         matchedItemsArray.push(item_copy);
     	})
       this.setState({search: true, dataToShow: matchedItemsArray})
@@ -277,7 +233,6 @@ searchUpdated = (input) => {
 
 display_contacts() { 
   return (
-
       <SectionList
         sections={this.state.dataToShow}
         keyExtractor={ (item, index) => item + index}

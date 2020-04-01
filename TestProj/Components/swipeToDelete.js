@@ -12,19 +12,13 @@ import {
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 
-//import {styles} from '../styles/main_styles';
-//import {home_styles} from '../styles/home_styles';
 import {profile_styles} from '../styles/profile_styles';
 
 export default function SwipeToDelete(props) {
 
     var arr = props.array;
-
-    //console.log("In swipe.");
-    //console.log(arr);
-
     var rowTranslateAnimatedValues = {};
-    
+
     Array(arr.length).fill('').forEach((_, i) => {
         rowTranslateAnimatedValues[`${i}`] = new Animated.Value(1);
     });
@@ -34,8 +28,6 @@ export default function SwipeToDelete(props) {
             .fill('')
             .map((_, i) => ({ key: `${i}`, text: props.array[i] }))
     );
-
-    //console.log(listData);
 
     const onSwipeValueChange = swipeData => {
         var { key, value } = swipeData;
@@ -81,7 +73,6 @@ export default function SwipeToDelete(props) {
                 </View>
             </TouchableHighlight>
         </Animated.View>
-        
     );
 
     const renderHiddenItem = () => (

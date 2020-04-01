@@ -6,20 +6,15 @@ import { Platform, StyleSheet, Text, TextInput,
         Alert,
         TouchableHighlight } from 'react-native';
 
-import Constants from "expo-constants";
-const { manifest } = Constants;
-
 import {styles} from '../styles/main_styles'
 
 export default class EnterCode extends Component {
 
   constructor(props) {
     super(props);
-    // this.login = props.onLogin;
   }
 
   callLogin = () => {
-    // this.login();
     console.log("Enter Code PROPS" + this.props.navigation);
     this.props.navigation.navigate('CreateJoin');
   }
@@ -29,23 +24,23 @@ export default class EnterCode extends Component {
       <View style={styles.container}>
         <Text style={styles.welcome}>You've got mail!</Text>
         <Text style={styles.instructions}>We just sent you a code. Please enter it below</Text>
-          <TextInput style={styles.phonenumber}
-            editable
-            maxLength={6}
-            placeholder="_ _ _ _ _ _"
-            returnKeyType='done'
-            keyboardType='phone-pad'
-            // onSubmitEditing={this.login}
+        <TextInput style={styles.phonenumber}
+          editable
+          maxLength={6}
+          placeholder="_ _ _ _ _ _"
+          returnKeyType='done'
+          keyboardType='phone-pad'
+          // onSubmitEditing={this.login}
+        />
+        <Text style={styles.warning}>Didn't get a code? Tap below to resend it to your phone number.</Text>
+        <Button
+            title="Resend Code"
           />
-          <Text style={styles.warning}>Didn't get a code? Tap below to resend it to your phone number.</Text>
-          <Button
-              title="Resend Code"
-            />
-          <View style = {styles.buttonSpaceContainer}>
-            <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.callLogin}>
-              <Text style={styles.loginText}>Enter</Text>
-            </TouchableHighlight>
-          </View>
+        <View style = {styles.buttonSpaceContainer}>
+          <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={this.callLogin}>
+            <Text style={styles.loginText}>Enter</Text>
+          </TouchableHighlight>
+        </View>
       </View>
     );
   }

@@ -15,8 +15,6 @@ import {
 import CreateOrJoin from './CreateOrJoin';
 import { Dropdown } from 'react-native-material-dropdown';
 
-import Constants from "expo-constants";
-const { manifest } = Constants;
 import axios from 'axios';
 
 import {styles} from '../styles/main_styles'
@@ -25,15 +23,9 @@ import {styles} from '../styles/main_styles'
 import { connect } from 'react-redux';
 import { changeSUID } from '../actions/suids';
 
-
-
 class Register extends Component {
-
   constructor(props) {
     super(props);
-
-    // this.register=props.onRegister;
-
     state = {
       first_name   : '',
       last_name: '',
@@ -43,64 +35,63 @@ class Register extends Component {
   }
 
   buttonListener = () => {
-    // Alert.alert("ERROR 1");
     // Send Name and SUID to server for account creation
     const body = {first_name: this.state.first_name, last_name: this.state.last_name,
         suid: this.state.suid, dorm: this.state.dorm};
     console.log(body);
     self = this;
     axios.post(this.props.suid.uri + '/send_prelim_user_data', body)
-        .then(res =>  {
-          self.props.changeSUID(self.state.suid);
-          self.props.navigation.navigate('Phone');
-        })
-        .catch((error) => {
-          if (error.response){
-            if (error.response.status == 401) {
-              Alert.alert("User with SUID already exists, please enter unique SUID")
-            }
-          console.log(error)
+      .then(res =>  {
+        self.props.changeSUID(self.state.suid);
+        self.props.navigation.navigate('Phone');
+      })
+      .catch((error) => {
+        if (error.response){
+          if (error.response.status == 401) {
+            Alert.alert("User with SUID already exists, please enter unique SUID")
           }
-      });
+        console.log(error)
+        }
+    });
   }
 
   state = {dorm: ''}
-   updateDorm = (dorm) => {
-      this.setState({ dorm: dorm })
-   }
+    updateDorm = (dorm) => {
+      this.setState({ dorm: dorm 
+    })
+  }
 
-render() {
+  render() {
     return (
-    <View style = {[styles.container, {alignItems: 'center'}]}>
-      <Text style = {[styles.header], {color: "white", paddingBottom: 50, fontSize: 20}}> Enter your information below to get started. </Text>
+      <View style = {[styles.container, {alignItems: 'center'}]}>
+        <Text style = {[styles.header], {color: "white", paddingBottom: 50, fontSize: 20}}> Enter your information below to get started. </Text>
 
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.inputs}
-            placeholder="First name"
-            onChangeText={(first_name) => this.setState({first_name})}/>
-      </View>
-
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.inputs}
-            placeholder="Last name"
-            onChangeText={(last_name) => this.setState({last_name})}/>
-      </View>
-
-	    <View style={styles.inputContainer}>
+        <View style={styles.inputContainer}>
           <TextInput style={styles.inputs}
-              placeholder="SUID (eg: gitakris)"
-              onChangeText={(suid) => this.setState({suid})}/>
+              placeholder="First name"
+              onChangeText={(first_name) => this.setState({first_name})}/>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <TextInput style={styles.inputs}
+              placeholder="Last name"
+              onChangeText={(last_name) => this.setState({last_name})}/>
+        </View>
+
+  	    <View style={styles.inputContainer}>
+            <TextInput style={styles.inputs}
+                placeholder="SUID (eg: gitakris)"
+                onChangeText={(suid) => this.setState({suid})}/>
+        </View>
+
+  		  <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
+          <Text style={styles.loginText}>Register</Text>
+        </TouchableHighlight>
+
       </View>
-
-		  <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
-        <Text style={styles.loginText}>Register</Text>
-      </TouchableHighlight>
-
-     </View>
     );
   }
 }
-
 
 const mapStateToProps = ({suid}) => ({
    suid

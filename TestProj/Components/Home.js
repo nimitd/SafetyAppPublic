@@ -23,14 +23,10 @@ import { Dropdown } from 'react-native-material-dropdown';
 import call from 'react-native-phone-call';
 import DatePicker from 'react-native-date-picker'
 
-
-import Constants from "expo-constants";
-import { Icon } from 'react-native-elements'
-
-const { manifest } = Constants;
 import axios from 'axios';
 
 import {styles} from '../styles/main_styles'
+import { Icon } from 'react-native-elements'
 import Modal from 'react-native-modal';
 
 // Redux Imports
@@ -41,176 +37,130 @@ const EVENTS = {};
 
 
 class Home extends Component {
-
-
 	constructor() {
-
 		super()
 		this.state = {
 			isModalVisible: false,
 			populatedEvents: false,
-	      sober_name   : 'test',
-	      event_title : 'test',
-	      sober_role: 'test',
-	      sober_phone: 'test',
-	      community: 'test',
-	      location: 'test',
-	      chosenStartDate: new Date(),
-	      chosenEndDate: new Date(),
+			sober_name   : 'test',
+			event_title : 'test',
+			sober_role: 'test',
+			sober_phone: 'test',
+			community: 'test',
+			location: 'test',
+			chosenStartDate: new Date(),
+			chosenEndDate: new Date(),
 		}
-
-      this.setStartDate = this.setStartDate.bind(this);
+      	this.setStartDate = this.setStartDate.bind(this);
     	this.setEndDate = this.setEndDate.bind(this);
-
-
 	}
-
 
 	onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-
-    setDate(currentDate);
-    setShow(Platform.OS === 'ios' ? true : false);
-  };
+	    const currentDate = selectedDate || date;
+	    setDate(currentDate);
+	    setShow(Platform.OS === 'ios' ? true : false);
+  	};
 
 	componentDidMount() {
-
-		console.log("IN DID MOUNT!!!!!!!!!!!!!!!!!!!!");
 		this.populate_events(); 
 		this.setState({populate_events: false});
-		// this.forceUpdate();
 		console.log("FINISHED POPULAING EVENTS IN DID MOUNT: ", EVENTS);
-
 	}
 
+	buttonListener = () => {
+		var self = this;
+		// Send Event details to server for event creation
+		const body = {event_title: this.state.event_title, sober_contact_name: this.state.sober_name,
+			sober_contact_phone: this.state.sober_phone, sober_contact_role: this.state.sober_role,
+			community: this.state.community, location: this.state.location};
+		console.log(body);
+		axios.post(self.props.suid.uri + '/publish_event', body)
+		    .then(res =>  {
+		    	Alert.alert(
+				  'Successfully published event!',
+				  'Please refresh your app to view newest changes.', // <- this part is optional, you can pass an empty string
+				  [
+				    {text: 'OK', onPress: () => self.closeModal()},
+				  ],
+				  {cancelable: false},
+				);
+		    	self.forceUpdate();
+		    })
+		    .catch((error) => {
+			    if (error.response){
+				    Alert.alert("Error, please try again");
+				    console.log(error)
+			    }
+			});
+	}
 
-  buttonListener = () => {
-  	var self = this;
-    // Send Event details to server for event creation
-    const body = {event_title: this.state.event_title, sober_contact_name: this.state.sober_name,
-    	sober_contact_phone: this.state.sober_phone, sober_contact_role: this.state.sober_role,
-    	community: this.state.community, location: this.state.location};
-    console.log(body);
-    axios.post(self.props.suid.uri + '/publish_event', body)
-        .then(res =>  {
-        	// Alert.alert("Successfully published event! Please refresh your app to view newest changes.")
-        	Alert.alert(
-			  'Successfully published event!',
-			  'Please refresh your app to view newest changes.', // <- this part is optional, you can pass an empty string
-			  [
-			    {text: 'OK', onPress: () => self.closeModal()},
-			  ],
-			  {cancelable: false},
-			);
+	makeCall = (number) => {
+		const args = {
+		    number: number, // String value with the number to call
+		    prompt: true // Optional boolean property. Determines if the user should be prompt prior to the call 
+		}
+		call(args).catch(console.error);
+	}
 
-
-        	// self.closeModal();
-        	self.forceUpdate();
-        })
-        .catch((error) => {
-          if (error.response){
-          	Alert.alert("Error, please try again");
-          	console.log(error)
-          }
-      });
-  }
-
-
-
-
-	  makeCall = (number) => {
-	     const args = {
-	         number: number, // String value with the number to call
-	         prompt: true // Optional boolean property. Determines if the user should be prompt prior to the call 
-	     }
-	    call(args).catch(console.error)
-	  
-	  }
-
-
-		populate_events = () => {
+	populate_events = () => {
 		console.log("IN POPULATE EVENTS");
-			self = this;
-			axios.post(self.props.suid.uri + '/get_event_data', {})
-					.then(res =>  {
-						console.log(res.data);
-						res.data.forEach(function (item, index) {
-							// console.log("DEBUG: inside for each");
-							// console.log("ITEM: ", item);
-							// console.log("INDEX: ", index);
-							console.log("INDEX:", index);
-							EVENTS[index] = {}
-							EVENTS[index]["event_title"] = item["event_title"]
-							EVENTS[index]["sober_contact_name"] = item["sober_contact_name"];
-							EVENTS[index]["sober_contact_phone"] = item["sober_contact_phone"];
-							EVENTS[index]["sober_contact_role"] = item["sober_contact_role"];
-							EVENTS[index]["community"] = item["community"];
-							EVENTS[index]["location"] = item["location"];
-
-							console.log("EVENTS SO FAR: ", EVENTS);
-							// new_data[item["name"]] = {}
-							// new_data[item["name"]].push({"description": item["description"], "phone": item["phone_num"], "email": item["email"]});
-							// new_data.push({
-							//   key: item.["name"],
-							//   value: {"description": item["description"], "phone": item["phone_num"], "email": item["email"]}
-							// });
-						}); 
-						// self.closeModal();
-						self.forceUpdate()
-					})
-					.catch((error) => {
-						if (error.response){
-							if (error.response.status == 401) {
-								Alert.alert("User with SUID already exists, please enter unique SUID")
-							}
-						console.log(error)
-						}
-				}); 
+		self = this;
+		axios.post(self.props.suid.uri + '/get_event_data', {})
+		.then(res =>  {
+			console.log(res.data);
+			res.data.forEach(function (item, index) {
+				console.log("INDEX:", index);
+				EVENTS[index] = {}
+				EVENTS[index]["event_title"] = item["event_title"]
+				EVENTS[index]["sober_contact_name"] = item["sober_contact_name"];
+				EVENTS[index]["sober_contact_phone"] = item["sober_contact_phone"];
+				EVENTS[index]["sober_contact_role"] = item["sober_contact_role"];
+				EVENTS[index]["community"] = item["community"];
+				EVENTS[index]["location"] = item["location"];
+				console.log("EVENTS SO FAR: ", EVENTS);
+			}); 
+			self.forceUpdate();
+		})
+		.catch((error) => {
+			if (error.response){
+				if (error.response.status == 401) {
+					Alert.alert("User with SUID already exists, please enter unique SUID")
+				}
+			console.log(error);
+			}
+		}); 
 		console.log("after axios post");    
 	}
 
-
-
 	display_item(title) {
-	return (
-		<View style={styles.sectionListItem}>
-			<View style={styles_here.title}>
-				 <Text style={styles_here.title}>{title}</Text>
-				 <View style = {styles_here.test}>
-
-					</View>
-		 </View>
-	</View>
-
-
+		return (
+			<View style={styles.sectionListItem}>
+				<View style={styles_here.title}>
+					<Text style={styles_here.title}>{title}</Text>
+					<View style = {styles_here.test}></View>
+			 	</View>
+			</View>
 		);
 	}
 
-
-
 	makeCall = (number) => {
-		 const args = {
-				 number: number, // String value with the number to call
-				 prompt: true // Optional boolean property. Determines if the user should be prompt prior to the call 
-		 }
-		call(args).catch(console.error)
-	
+		const args = {
+			number: number, // String value with the number to call
+			prompt: true // Optional boolean property. Determines if the user should be prompt prior to the call 
+		}
+		call(args).catch(console.error);
 	}
 
 	setStartDate(newDate) {
-    this.setState({chosenStartDate: newDate});
-  }
-
+		this.setState({chosenStartDate: newDate});
+	}
 
 	setEndDate(newDate) {
-    this.setState({chosenEndDate: newDate});
-  }
+		this.setState({chosenEndDate: newDate});
+	}
 
-
-
-display_contacts() { 
-	return (
-
+	display_contacts() { 
+		return (
 			<SectionList
 				sections={this.state.dataToShow}
 				keyExtractor={ (item, index) => item + index}
@@ -220,261 +170,221 @@ display_contacts() {
 		);
 	}
 
+	publish_event_modal() {
+		return (    
+			<ScrollView style={styles.scrollView}>
+	    		<View style = {styles.textboxcontainers}>
+		      		<Text style = {styles.header}> Enter your event information below to get started. </Text>
+			      	<View style={styles.header}>
+			         	<Text>Enter the event title: </Text>
+			      	</View>
+		     		<View style={styles.inputContainer}>
+		       			<TextInput style={styles.inputs} 
+		       			 	placeholder="Event Title"
+		       			 	onChangeText={(event_title) => this.setState({event_title})}
+		       			/>
+		      		</View>
+			      	<View style={styles.header}>
+			         	<Text>Enter the name you would like displayed as the sober contact for this event.</Text>
+			      	</View>
+		     		<View style={styles.inputContainer}>
+		       			<TextInput style={styles.inputs}
+		       				placeholder="Sober Contact Name"
+		       				onChangeText={(sober_name) => this.setState({sober_name})}
+		       			/>
+		      		</View>
+			      	<View style={styles.header}>
+			         	<Text>What is this person's role (ex: RA, Sober Moniter)?</Text>
+			      	</View>
+		     		<View style={styles.inputContainer}>
+		       			<TextInput style={styles.inputs}
+		       				placeholder="On-Call RA / Sober Moniter"
+		       				onChangeText={(sober_role) => this.setState({sober_role})}
+		       			/>
+		      		</View>
+					<View style={styles.header}>
+						<Text>Enter the phone number you would like displayed as for the sober contact. (Note this number will be publicly available).</Text>
+					</View>
+				    <View style={styles.inputContainer}>
+			          	<TextInput style={styles.inputs}
+			            	placeholder="Phone Number"
+			            	onChangeText={(sober_phone) => this.setState({sober_phone})}
+			            />
+			        </View>
+			      	<View style={styles.header}>
+			       		<Text>Enter the location of your event: </Text>
+			     	</View>
+			 		<View style={styles.inputContainer}>
+			          	<TextInput style={styles.inputs}
+			            	placeholder="Location"
+			            	onChangeText={(location) => this.setState({location})}
+			            />
+				    </View>
+	   			</View>
+				<View style={styles.header}>
+					<Text>Optionally share this event with one of your communities:</Text>
+				</View>
+				<View style = {styles.dropdown}>
+					<Dropdown
+				    	onChangeText={(community) => this.setState({community})}
+					    label='Choose a community'
+					    data={[
+					        {value: 'Mars'},
+					        {value: '680'},
+					       	{value: 'Xanadu'},
+				        ]}
+				    />
+				</View>
+				<View>
+					<View style={styles.header}>
+						<Text>Set the start time of your event: </Text>
+					</View>
+					<View style={styles_here.date_time_container}>
+						<DatePickerIOS
+							date={this.state.chosenStartDate}
+					   		onDateChange={this.setStartDate}
+					 	/>
+					</View>
+					<View style={styles.header}>
+						<Text>Set the end time of your event: </Text>
+					</View>
+					<View style={styles_here.date_time_container}>
+						<DatePickerIOS
+							date={this.state.chosenEndDate}
+							onDateChange={this.setEndDate}
+					 	/>
+					</View>
+				</View>
+	    		<View style = {styles.buttonSpaceContainer}>
+	    			<TouchableOpacity style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
+	            		<Text style={styles.loginText}>Publish My Event</Text>
+	          		</TouchableOpacity>
+	        	</View>
+	    	</ScrollView>
+	    );
+	}
 
-publish_event_modal() {
-	return (    
-		<ScrollView style={styles.scrollView}>
-    		<View style = {styles.textboxcontainers}>
-      		<Text style = {styles.header}> Enter your event information below to get started. </Text>
-	    
-	      	<View style={styles.header}>
-	         	<Text>Enter the event title: </Text>
-	      	</View>
-	     		 <View style={styles.inputContainer}>
-	       			 <TextInput style={styles.inputs}
-	            placeholder="Event Title"
-	            onChangeText={(event_title) => this.setState({event_title})}/>
-	      	</View>
-
-
-
-	      	<View style={styles.header}>
-	         	<Text>Enter the name you would like displayed as the sober contact for this event.</Text>
-	      	</View>
-	     		 <View style={styles.inputContainer}>
-	       			 <TextInput style={styles.inputs}
-	            placeholder="Sober Contact Name"
-	            onChangeText={(sober_name) => this.setState({sober_name})}/>
-	      	</View>
-
-
-	      	<View style={styles.header}>
-	         	<Text>What is this person's role (ex: RA, Sober Moniter)?</Text>
-	      	</View>
-	     		 <View style={styles.inputContainer}>
-	       			 <TextInput style={styles.inputs}
-	            placeholder="On-Call RA / Sober Moniter"
-	            onChangeText={(sober_role) => this.setState({sober_role})}/>
-	      	</View>
-
-
-		      <View style={styles.header}>
-		        <Text>Enter the phone number you would like displayed as for the sober contact. (Note this number will be publicly available).</Text>
-		      </View>
-
-			   <View style={styles.inputContainer}>
-		          <TextInput style={styles.inputs}
-		              placeholder="Phone Number"
-		              onChangeText={(sober_phone) => this.setState({sober_phone})}/>
-		        </View>
-
-
-		      <View style={styles.header}>
-		       	<Text>Enter the location of your event: </Text>
-		     	</View>
-
-		 		<View style={styles.inputContainer}>
-		          <TextInput style={styles.inputs}
-		              placeholder="Location"
-		              onChangeText={(location) => this.setState({location})}/>
-			    </View>
-   	</View>
-
-      <View style={styles.header}>
-        <Text>Optionally share this event with one of your communities:</Text>
-      </View>
-
-       <View style = {styles.dropdown}>
-          <Dropdown
-              onChangeText={(community) => this.setState({community})}
-    		        label='Choose a community'
-    		        data={[
-    		        {value: 'Mars'},
-    		        {value: '680'},
-    		       	{value: 'Xanadu'},
-    		        ]}
-    		      />
-	    </View>
-
-
-
-        <View>
-
-		      <View style={styles.header}>
-		       	<Text>Set the start time of your event: </Text>
-		     	</View>
-
-			   <View style={styles_here.date_time_container}>
-			     <DatePickerIOS
-			       date={this.state.chosenStartDate}
-			       onDateChange={this.setStartDate}
-			     />
-		  		</View>
-
-		  		<View style={styles.header}>
-		       	<Text>Set the end time of your event: </Text>
-		     	</View>
-
-			   <View style={styles_here.date_time_container}>
-			     <DatePickerIOS
-			       date={this.state.chosenEndDate}
-			       onDateChange={this.setEndDate}
-			     />
-		  		</View>
-
-
-
-    		</View>
-
-    		<View style = {styles.buttonSpaceContainer}>
-    		  <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.buttonListener()}>
-            <Text style={styles.loginText}>Publish My Event</Text>
-          </TouchableOpacity>
-        </View>
-     </ScrollView>
-);
-}
-
-display_sober_ppl() {
-	var range = Object.keys(EVENTS); 
-	var self = this;
-	var namesList = range.map(function(index) {
-                        return (
-							<TouchableOpacity onPress={() => self.makeCall(EVENTS[index]['sober_contact_phone'])}>
-	                        	<View style = {styles_here.sectionListItemSober}>
-	                        		{EVENTS[index]!=undefined ?
-	                        			<View>
-	                        				<Text style = {styles_here.event_text}> <Text style = {{fontWeight: 'bold', fontSize: 15}}> {EVENTS[index]['sober_contact_name']} {'\n'} </Text>
-	                        				</Text>
-													<View style = {{flexDirection: 'row', paddingBottom: 10}}>
-										              <Icon name = "location-on" size = {20}/> 
-															<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['location']} </Text>									            
-														</View>
-													<View style = {{flexDirection: 'row', paddingBottom: 10}}>
-										              <Icon name = "person" size = {20}/> 
-															<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_role']} </Text>									            
-													</View>
-													
-										            <View style = {{flexDirection: 'row'}}>
-										              <Icon name = "phone" size = {20}/> 
-															<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_phone']} </Text>									            
-														</View>
-
-						 						</View>
-						 						: <Text style = {styles.loginText}> Loading... </Text>}
-				 				</View>
-			 				</TouchableOpacity>
-                      )});
-
-	namesList.push(
-		<View style = {[styles_here.sectionListItemSober, {backgroundColor: 'dimgrey'}]}>
-     		<TouchableOpacity onPress={() => this.openModal()}>
-     			<View>
-        			<Icon name = "add" size = {130}/> 
-      			<Modal isVisible={this.state.isModalVisible} style={styles_here.modal} onBackdropPress={()=>this.closeModal()}>
-      				{this.publish_event_modal()}
-      			</Modal>
-      		</View>
-      	</TouchableOpacity>
-		</View>
+	display_sober_ppl() {
+		var range = Object.keys(EVENTS); 
+		var self = this;
+		var namesList = range.map(function(index) {
+			return (
+				<TouchableOpacity onPress={() => self.makeCall(EVENTS[index]['sober_contact_phone'])}>
+			    	<View style = {styles_here.sectionListItemSober}>
+			    		{EVENTS[index]!=undefined ?
+			    			<View>
+			    				<Text style = {styles_here.event_text}> 
+			    					<Text style = {{fontWeight: 'bold', fontSize: 15}}> {EVENTS[index]['sober_contact_name']} {'\n'} </Text>
+			    				</Text>
+								<View style = {{flexDirection: 'row', paddingBottom: 10}}>
+					              	<Icon name = "location-on" size = {20}/> 
+									<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['location']} </Text>									            
+								</View>
+								<View style = {{flexDirection: 'row', paddingBottom: 10}}>
+					              	<Icon name = "person" size = {20}/> 
+									<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_role']} </Text>									            
+								</View>
+					            <View style = {{flexDirection: 'row'}}>
+					              	<Icon name = "phone" size = {20}/> 
+									<Text style = {[styles_here.event_text, {fontSize: 15, paddingTop: 0}]}> {EVENTS[index]['sober_contact_phone']} </Text>									            
+								</View>
+			 				</View> : <Text style = {styles.loginText}> Loading... </Text>
+			 			}
+					</View>
+				</TouchableOpacity>
+			)
+		});
+		namesList.push(
+			<View style = {[styles_here.sectionListItemSober, {backgroundColor: 'dimgrey'}]}>
+	     		<TouchableOpacity onPress={() => this.openModal()}>
+	     			<View>
+	        			<Icon name = "add" size = {130}/> 
+	      				<Modal isVisible={this.state.isModalVisible} style={styles_here.modal} onBackdropPress={()=>this.closeModal()}>
+	      					{this.publish_event_modal()}
+	      				</Modal>
+	      			</View>
+	      		</TouchableOpacity>
+			</View>
 		);
+	   return (<ScrollView horizontal = {true}>{namesList }</ScrollView>);
+	}
 
-
-   return (<ScrollView horizontal = {true}>{namesList }</ScrollView>);
-
-}
-
-display_navigation_options() {
-
-	return ( 					
-		<ScrollView horizontal = {true}>
-			 <TouchableOpacity onPress={() => this.makeCall('6507257873')}>
-				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
-					<Text style={[styles_here.navigation_text]}> 5-SURE </Text> 
-				</View>
-			</TouchableOpacity>
-
-			<TouchableOpacity onPress={() => Linking.openURL('maps://app?saddr=Cupertino&San+Francisco')}>
-				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
-					<Text style={[styles.loginText, styles_here.navigation_text, {textAlign: 'center'}]}>Walking Directions via Maps </Text> 
-				</View>
-			</TouchableOpacity>
-
-
-			<TouchableOpacity onPress={() => Linking.openURL('https://campus-map.stanford.edu/')}>
-				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
-					<Text style={[styles.loginText, styles_here.navigation_text, {textAlign: 'center'}]}>Stanford Campus Searchable Map </Text> 
-				</View>
-			</TouchableOpacity>
-
-
-
-			<TouchableOpacity onPress={() => Linking.openURL('lyft://app')}>
-				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
-					<Text style={[styles.loginText, styles_here.navigation_text]}> Lyft </Text> 
-				</View>
-			</TouchableOpacity>
-
-			<TouchableOpacity onPress={() => Linking.openURL('uber://app')}>
-				<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
-					<Text style={[styles.loginText, styles_here.navigation_text]}> Uber </Text> 
-				</View>
-			</TouchableOpacity>
-
-		</ScrollView>);
-		}
-
-
+	display_navigation_options() {
+		return ( 					
+			<ScrollView horizontal = {true}>
+				<TouchableOpacity onPress={() => this.makeCall('6507257873')}>
+					<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
+						<Text style={[styles_here.navigation_text]}> 5-SURE </Text> 
+					</View>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => Linking.openURL('maps://app?saddr=Cupertino&San+Francisco')}>
+					<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
+						<Text style={[styles.loginText, styles_here.navigation_text, {textAlign: 'center'}]}>Walking Directions via Maps </Text> 
+					</View>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => Linking.openURL('https://campus-map.stanford.edu/')}>
+					<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
+						<Text style={[styles.loginText, styles_here.navigation_text, {textAlign: 'center'}]}>Stanford Campus Searchable Map </Text> 
+					</View>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => Linking.openURL('lyft://app')}>
+					<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
+						<Text style={[styles.loginText, styles_here.navigation_text]}> Lyft </Text> 
+					</View>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => Linking.openURL('uber://app')}>
+					<View style={[styles_here.sectionListItemNavigate, styles_here.navigation]}>
+						<Text style={[styles.loginText, styles_here.navigation_text]}> Uber </Text> 
+					</View>
+				</TouchableOpacity>
+			</ScrollView>
+		);
+	}
 
 	display_emergency_buttons() {
-
 		return (
 			<View style = {[{flexDirection: 'row'}]}>
 				<ScrollView horizontal = {true}>
 					<TouchableOpacity onPress={() => self.makeCall('8023933907')}>
 						<View style = {styles_here.emergency_button}> 
 				            <View style = {[]}>
-									<Text style = {[styles_here.event_text, {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10, paddingBottom: 10}]}> EMERGENCY CONTACT</Text>									            
-				              <Icon name = "phone" size = {35}/> 
-								</View>
+								<Text style = {[styles_here.event_text, {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10, paddingBottom: 10}]}> EMERGENCY CONTACT</Text>									            
+				              	<Icon name = "phone" size = {35}/> 
+							</View>
 						</View>
 					</TouchableOpacity>
-
 					<TouchableOpacity onPress={() => self.makeCall('8023933907')}>
 						<View style = {styles_here.emergency_button}> 
 				            <View style = {[]}>
-									<Text style = {[styles_here.event_text, {fontSize: 30, fontWeight: 'bold', textAlign: 'center', paddingTop: 15, paddingBottom: 15}]}> 911 </Text>									            
-				              <Icon name = "phone" size = {35}/> 
-								</View>
+								<Text style = {[styles_here.event_text, {fontSize: 30, fontWeight: 'bold', textAlign: 'center', paddingTop: 15, paddingBottom: 15}]}> 911 </Text>									            
+				              	<Icon name = "phone" size = {35}/> 
+							</View>
 						</View>
 					</TouchableOpacity>
-
 					<TouchableOpacity onPress={() => self.makeCall('8023933907')}>
 						<View style = {styles_here.emergency_button}> 
 				            <View style = {[]}>
-									<Text style = {[styles_here.event_text, {fontSize: 20, paddingTop: 10, paddingBottom: 10, fontWeight: 'bold', textAlign: 'center'}]}> STANFORD POLICE </Text>			
-				              <Icon name = "phone" size = {30}/>
-								</View>
+								<Text style = {[styles_here.event_text, {fontSize: 20, paddingTop: 10, paddingBottom: 10, fontWeight: 'bold', textAlign: 'center'}]}> STANFORD POLICE </Text>			
+				              	<Icon name = "phone" size = {30}/>
+							</View>
 						</View>
 					</TouchableOpacity>
 				</ScrollView>
 			</View>
-
-			);
+		);
 	}
 
+	openModal = () => {
+		console.log("OPENING MODAL");
+		this.setState({isModalVisible: true});
+	}
 
-openModal = () => {
-  	console.log("OPENING MODAL");
-  	this.setState({isModalVisible: true});
- }
+	closeModal = () => {
+		this.setState({isModalVisible: false});
+	}
 
-closeModal = () => {
-  	this.setState({isModalVisible: false});
-  }
-
-render() {
-	return (
+	render() {
+		return (
 			<View style = {[styles.container, {justifyContent: 'space-around'}]}>
 				<Text style = {[styles_here.section_header, {textAlign: 'center', fontSize: 30}]}> HEY, YOU :) </Text>
 				<Text style = {[styles_here.section_header, {}]}> Who's Sober? </Text>
@@ -483,25 +393,20 @@ render() {
 				{this.display_navigation_options()}
 				<Text style = {styles.loginText}> Emergency Calls </Text>
 				{this.display_emergency_buttons()}
-			</ View>
-	);
-}
+			</View>
+		);
+	}
 }
 
 const mapStateToProps = ({suid}) => ({
-   suid
+	suid
 });
 
 const mapDispatchToProps = {
-  changeSUID
+	changeSUID
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
-
-
-
-
-
 
 const styles_here = StyleSheet.create({
 	header: {
@@ -510,7 +415,6 @@ const styles_here = StyleSheet.create({
 		padding: 20,
 		marginVertical: 10,
 	},
-
 	navigation_text: {
 		color: 'white', 
 		fontSize: 20
@@ -594,9 +498,9 @@ const styles_here = StyleSheet.create({
 		alignItems: 'center',		
 	},
 	date_time_container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
+    	flex: 1,
+    	justifyContent: 'center',
+  	},
 });
 
 
